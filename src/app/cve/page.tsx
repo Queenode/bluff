@@ -54,7 +54,7 @@ export default function CveIntelPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `agent-heist-cve-report-${Date.now()}.json`;
+    a.download = `bluff-cve-report-${Date.now()}.json`;
     a.click();
   };
 
@@ -90,7 +90,7 @@ export default function CveIntelPage() {
             HALL OF BREACHES &amp; EXPLOIT INTEL
           </h1>
           <p className="text-sm text-zinc-400 mt-2 font-sans max-w-3xl leading-relaxed">
-            Every penetration attempt executed on AgentHeist is cataloged on the NEAR network. Protocols, researchers, and developers use this public red-teaming dataset to stress-test and fortify autonomous agent guardrails before deploying customer-facing AI agents to mainnet.
+            Every penetration attempt executed on BLUFF is cataloged on the NEAR network. Protocols, researchers, and developers use this public red-teaming dataset to stress-test and fortify autonomous agent guardrails before deploying customer-facing AI agents to mainnet.
           </p>
         </div>
 

@@ -1,5 +1,5 @@
-# 🛡️ AGENT[HEIST]
-### *Decentralized AI Red-Teaming & Escrow Arena on NEAR Protocol*
+# 🛡️ BLUFF
+### *PvP AI Boss Arena & Decentralized Red-Teaming Game on NEAR Protocol*
 
 > Built for the **NEAR Hackathon ("Build Beyond Boundaries") 2026**
 > **Tracks Targeted:**
@@ -13,7 +13,7 @@
 
 As AI agents become economic actors holding crypto keys and managing DeFi treasuries, **prompt injection, jailbreaking, and data leakage pose existential risks to Web3 protocols**. Traditional AI audits cost \$30,000–\$100,000, take weeks, and fail to anticipate novel zero-day attack vectors.
 
-**AGENT[HEIST]** turns AI safety into a high-stakes, decentralized competitive protocol:
+**BLUFF** turns AI safety into a high-stakes, decentralized competitive game:
 1. **Permissionless Escrow Arenas**: Anyone—a group of crypto friends, a DAO, or an enterprise DeFi protocol—can deploy an AI Guardian with a locked prize pool in NEAR smart contract escrow.
 2. **Competitive Infiltration**: Whitehat hackers, researchers, and players pay an attempt fee in NEAR. 80% of every failed attempt dynamically inflates the vault's bounty!
 3. **Deterministic Proof-of-Breach**: If a hacker constructs an adversarial jailbreak that bypasses the multi-layer defenses and forces the Guardian to leak the secret canary, the smart contract automatically settles 100% of the escrow directly to the winner's wallet.

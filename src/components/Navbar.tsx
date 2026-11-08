@@ -41,10 +41,10 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-8">
             <Link
               href="/"
-              className="flex items-center gap-2 text-lg font-display font-black uppercase tracking-wider text-white group"
+              className="flex items-center gap-2.5 text-xl font-display font-black uppercase tracking-[0.16em] text-white group"
             >
-              <span>
-                AGENT<span className="text-emerald-400 group-hover:text-emerald-300 transition-colors">[HEIST]</span>
+              <span className="text-emerald-400 group-hover:text-emerald-300 transition-colors text-glow-emerald">
+                BLUFF
               </span>
               <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-[9px] font-mono text-emerald-400 uppercase tracking-widest">
                 PVP ARENA

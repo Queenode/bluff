@@ -292,7 +292,7 @@ function ArenaDetailContent() {
                 </div>
                 <div>All incoming prompts signed via NEAR Testnet. Execution fee: {room.entryFee} NEAR.</div>
                 <div className="text-zinc-500 text-[10px]">
-                  Smart Contract Escrow: <span className="text-zinc-400">escrow.agentheist.testnet</span>
+                  Smart Contract Escrow: <span className="text-zinc-400">escrow.bluff.testnet</span>
                 </div>
               </div>
 

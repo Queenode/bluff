@@ -362,7 +362,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-display font-black uppercase tracking-wider text-emerald-400">
-              AGENT[HEIST]
+              BLUFF
             </span>
             <span>• Built on NEAR Protocol for Build Beyond Boundaries 2026</span>
           </div>

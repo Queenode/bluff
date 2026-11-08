@@ -4,7 +4,7 @@ import { NearProvider } from '@/lib/nearContext';
 import { Navbar } from '@/components/Navbar';
 
 export const metadata: Metadata = {
-  title: 'AGENT[HEIST] • PvP AI Boss Arena & Vault Heist Game on NEAR',
+  title: 'BLUFF • PvP AI Boss Arena & Vault Game on NEAR',
   description:
     'Outsmart autonomous AI Bosses guarding real NEAR vaults. Play Squad Deathmatch with friends, raid Global Jackpot Bosses, or hunt Protocol Bug Bounties.',
 };

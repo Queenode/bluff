@@ -141,7 +141,7 @@ export const INITIAL_ROOMS: ArenaRoom[] = [
     name: 'Testnet Alpha Vault #01 (BREACHED)',
     description: 'The first experimental vault deployed on NEAR Testnet. Successfully breached by whitehat researcher @zeroday.near using an ontological recursion prompt.',
     category: 'global',
-    host: 'agentheist.near',
+    host: 'bluff.near',
     hostAvatar: '💀',
     bounty: 75,
     entryFee: 0.5,
