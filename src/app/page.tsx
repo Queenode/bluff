@@ -4,7 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { useNear } from '@/lib/nearContext';
 import { ArenaCard } from '@/components/ArenaCard';
-import { CinematicVaultMonolith } from '@/components/CinematicVaultMonolith';
+import { CinematicBackgroundCanvas } from '@/components/CinematicBackgroundCanvas';
+import { CinematicHeroConsole } from '@/components/CinematicHeroConsole';
 import {
   Shield,
   Zap,
@@ -26,87 +27,56 @@ export default function HomePage() {
     return room.category === activeFilter;
   });
 
-  const totalBounty = rooms
-    .filter(r => r.status === 'active')
-    .reduce((acc, curr) => acc + curr.bounty, 0);
-
-  const totalAttempts = rooms.reduce((acc, curr) => acc + curr.attemptsCount, 0);
-
   return (
     <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-emerald-500 selection:text-black">
-      {/* Cinematic Hero Section */}
-      <section className="relative pt-24 pb-28 px-4 text-center overflow-hidden border-b border-zinc-900 cinematic-grid">
-        {/* Massive Ambient Celestial Spotlight */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-emerald-500/10 blur-[180px] rounded-full pointer-events-none animate-atmosphere" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-cyan-500/10 blur-[140px] rounded-full pointer-events-none" />
+      {/* Cinematic Hero Section with Live Neural Particle Canvas */}
+      <section className="relative pt-24 pb-28 px-4 text-center overflow-hidden border-b border-zinc-900">
+        {/* Interactive Neural Constellation Background */}
+        <CinematicBackgroundCanvas />
 
-        <div className="max-w-5xl mx-auto relative z-10 space-y-10">
-          {/* Filmic Category Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/90 border border-zinc-800 text-zinc-400 text-[11px] font-mono tracking-widest uppercase">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        {/* Soft Atmospheric Vignette */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-emerald-500/10 blur-[180px] rounded-full pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto relative z-10 space-y-8">
+          {/* Subtle Editorial Pill */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/80 border border-zinc-800 text-zinc-400 text-[11px] font-mono tracking-widest uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span>NEAR PROTOCOL • DECENTRALIZED AI RED-TEAMING</span>
           </div>
 
           {/* Cinematic Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black font-mono tracking-tight text-white max-w-4xl mx-auto leading-[1.06]">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black font-mono tracking-tight text-white max-w-4xl mx-auto leading-[1.08]">
             CAN YOU TRICK AN AI INTO GIVING YOU ITS{' '}
             <span className="text-emerald-400">CRYPTO?</span>
           </h1>
 
-          {/* Crisp, Filmic Subcaption */}
-          <p className="text-base sm:text-lg text-zinc-400 font-sans max-w-2xl mx-auto leading-relaxed">
+          {/* Punchy, Confident One-Liner */}
+          <p className="text-base sm:text-lg text-zinc-400 font-sans max-w-xl mx-auto leading-relaxed">
             Autonomous AI agents guard millions in onchain escrow. Breach the sentinel with clever prompts to claim the bounty instantly.
           </p>
 
-          {/* CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-1 font-mono text-xs">
+          {/* High-End Action Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 font-mono text-xs">
             <a
               href="#vaults"
-              className="px-7 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold tracking-wide transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:scale-105 flex items-center gap-2"
+              className="px-6 py-3.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold tracking-wide transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center gap-2"
             >
-              <span>INFILTRATE LIVE VAULTS</span>
+              <span>Explore Live Vaults</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
             <Link
               href="/create"
-              className="px-6 py-3.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 hover:border-zinc-700 font-bold tracking-wide transition-all hover:scale-105 flex items-center gap-2"
+              className="px-6 py-3.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 hover:border-zinc-700 font-semibold tracking-wide transition-all flex items-center gap-2"
             >
               <Plus className="w-4 h-4 text-zinc-400" />
-              <span>DEPLOY ARENA</span>
+              <span>Deploy Arena</span>
             </Link>
           </div>
 
-          {/* The Cinematic Vault Monolith Centerpiece */}
-          <div className="pt-6">
-            <CinematicVaultMonolith totalBounty={totalBounty} />
-          </div>
-
-          {/* Telemetry Strip */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-4 font-mono text-left text-xs">
-            <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
-              <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Escrow Locked</div>
-              <div className="text-xl font-bold text-emerald-400 mt-1">{totalBounty.toFixed(1)} NEAR</div>
-              <div className="text-[10px] text-zinc-500 mt-0.5">Trustless smart contract</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
-              <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Active Enclaves</div>
-              <div className="text-xl font-bold text-white mt-1">{rooms.length} Arenas</div>
-              <div className="text-[10px] text-zinc-500 mt-0.5">Fortress &amp; GodMode tiers</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
-              <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Attacks Evaluated</div>
-              <div className="text-xl font-bold text-zinc-200 mt-1">{totalAttempts}</div>
-              <div className="text-[10px] text-zinc-500 mt-0.5">Red-team vectors logged</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
-              <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Settlement</div>
-              <div className="text-xl font-bold text-white mt-1">Instant</div>
-              <div className="text-[10px] text-zinc-500 mt-0.5">Automatic onchain release</div>
-            </div>
+          {/* Cinematic Interactive Console Showcase */}
+          <div className="pt-8">
+            <CinematicHeroConsole />
           </div>
         </div>
       </section>

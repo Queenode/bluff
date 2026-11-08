@@ -226,3 +226,4 @@ export const CinematicVaultMonolith: React.FC<CinematicVaultMonolithProps> = ({ 
     </div>
   );
 };
+
