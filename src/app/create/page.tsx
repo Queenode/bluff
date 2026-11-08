@@ -111,11 +111,11 @@ export default function CreateArenaPage() {
       <div className="border-b border-zinc-800/80 bg-zinc-950/80 px-4 py-4 sticky top-16 z-40 backdrop-blur-md">
         <div className="max-w-4xl mx-auto flex items-center justify-between font-mono text-xs">
           <Link
-            href="/"
+            href="/arenas"
             className="flex items-center gap-1.5 text-zinc-400 hover:text-emerald-400 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>RETURN TO VAULTS</span>
+            <span>BACK TO RAID LOBBY</span>
           </Link>
           <div className="text-zinc-400">
             HOST WALLET: <span className="text-emerald-400 font-bold">{accountId}</span> ({balance.toFixed(2)} Ⓝ)
@@ -125,12 +125,12 @@ export default function CreateArenaPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-black font-mono text-white tracking-wide flex items-center gap-2">
+          <h1 className="text-3xl font-black font-mono text-white tracking-wide flex items-center gap-2 uppercase">
             <PlusCircle className="w-8 h-8 text-emerald-400" />
-            <span>DEPLOY NEW VAULT ARENA</span>
+            <span>HOST NEW BOSS ARENA</span>
           </h1>
           <p className="text-sm text-zinc-400 mt-2 font-sans">
-            Seed a prize pool in NEAR smart contract escrow, define your AI Guardian's rules and secret canary, and let hackers or friends battle to crack it.
+            Lock a prize pot in NEAR escrow, arm your AI Boss with custom rules and a secret canary, and challenge players or whitehats to crack it.
           </p>
         </div>
 
@@ -352,10 +352,10 @@ export default function CreateArenaPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm tracking-wider uppercase transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2"
+            className="w-full py-4 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-extrabold text-sm tracking-wider uppercase transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2"
           >
             <PlusCircle className="w-5 h-5" />
-            <span>DEPLOY ARENA & DEPOSIT {bounty} NEAR TO ESCROW</span>
+            <span>LAUNCH ARENA &amp; LOCK {bounty} NEAR IN POT</span>
           </button>
         </form>
       </div>

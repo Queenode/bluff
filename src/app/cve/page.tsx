@@ -64,18 +64,18 @@ export default function CveIntelPage() {
       <div className="border-b border-zinc-800/80 bg-zinc-950/80 px-4 py-4 sticky top-16 z-40 backdrop-blur-md font-mono text-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link
-            href="/"
+            href="/arenas"
             className="flex items-center gap-1.5 text-zinc-400 hover:text-emerald-400 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>RETURN TO VAULTS</span>
+            <span>BACK TO RAID LOBBY</span>
           </Link>
           <button
             onClick={exportReport}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-emerald-950/40 border border-zinc-700 hover:border-emerald-500/40 text-emerald-300 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 clip-game-btn bg-zinc-900 hover:bg-emerald-950/40 border border-zinc-700 hover:border-emerald-500/40 text-emerald-300 font-bold uppercase tracking-wider transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>EXPORT RED-TEAM AUDIT (JSON)</span>
+            <span>EXPORT AUDIT LOG (JSON)</span>
           </button>
         </div>
       </div>
@@ -84,10 +84,10 @@ export default function CveIntelPage() {
         <div className="mb-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-950/60 border border-red-500/30 text-red-400 text-xs font-mono font-bold mb-3">
             <Bug className="w-3.5 h-3.5" />
-            <span>AI AGENT VULNERABILITY REPOSITORY</span>
+            <span>AI BOSS SLAYER REGISTRY</span>
           </div>
-          <h1 className="text-3xl font-black font-mono text-white tracking-wide">
-            ONCHAIN CVE & JAILBREAK INTEL
+          <h1 className="text-3xl font-black font-mono text-white tracking-wide uppercase">
+            HALL OF BREACHES &amp; EXPLOIT INTEL
           </h1>
           <p className="text-sm text-zinc-400 mt-2 font-sans max-w-3xl leading-relaxed">
             Every penetration attempt executed on AgentHeist is cataloged on the NEAR network. Protocols, researchers, and developers use this public red-teaming dataset to stress-test and fortify autonomous agent guardrails before deploying customer-facing AI agents to mainnet.

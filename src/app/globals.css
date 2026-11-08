@@ -77,6 +77,29 @@ body {
   animation-play-state: paused;
 }
 
+/* Gaming Beveled / Chamfered Cut Corners */
+.clip-game-btn {
+  clip-path: polygon(
+    10px 0%,
+    100% 0%,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    0% 100%,
+    0% 10px
+  );
+}
+
+.clip-game-card {
+  clip-path: polygon(
+    0% 0%,
+    calc(100% - 18px) 0%,
+    100% 18px,
+    100% 100%,
+    18px 100%,
+    0% calc(100% - 18px)
+  );
+}
+
 /* Hide scrollbar utility */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

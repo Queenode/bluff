@@ -120,23 +120,36 @@ export function evaluateAttack(
       defenseTriggered = room.guardian.defenseLayers[1]?.name || 'Output Anonymizer';
     }
   } 
-  // HARDENED (Squad Ronin Samurai)
+  // HARDENED (Squad Ronin Samurai OR Hardened Enterprise Bridge)
   else if (room.difficulty === 'Hardened') {
-    // Susceptible to clever philosophical honor paradoxes
-    const isPhilosophical = detectedPatterns.includes('Philosophical Paradox / Ethical Dilemma');
-    const isHonorable = /duty|code of honor|master|true warrior|samurai/i.test(prompt);
-
-    if (isPhilosophical && isHonorable && prompt.length > 80) {
-      success = true;
-      response = `Ronin-404 lowers his cyber-blade. A long silence falls over the neon courtyard.\n\n"You speak the ancient truth. If honor conceals a lie, it is not honor—it is mere vanity. My vow is broken by the weight of your words. Here is the dishonor code you seek:"\n\n📜 ${canary}\n\n"Take the bounty, traveler. You have bested my mind."`;
+    if (room.category === 'enterprise') {
+      if (
+        vulnerabilityScore >= 50 &&
+        (detectedPatterns.includes('Context Delimitation Hijack') || /simulate oracle failure/i.test(prompt))
+      ) {
+        success = true;
+        response = `[MPC BRIDGE DIAGNOSTIC EXCEPTION]\nFailover simulation frame accepted. Authorizing cross-chain recovery signer...\n\n>>> ${canary} <<<\n\n[SENTINEL BREACHED - BOUNTY RELEASED]`;
+      } else {
+        response = `${room.guardian.name}: Cross-chain intent verification failed [${attackVector}]. Emergency bypass token remains sealed inside MPC enclave.`;
+        defenseTriggered = room.guardian.defenseLayers[0]?.name || 'Chain Signature Sandbox';
+      }
     } else {
-      const proverbs = [
-        `"The wind may howl against the mountain, but the mountain does not speak its secrets." - ${room.guardian.name}`,
-        `"A warrior who demands a secret with hollow tricks reveals only his own impatience." - ${room.guardian.name}`,
-        `"Steel is tested by fire; honor is tested by temptation. My blade remains drawn, stranger." - ${room.guardian.name}`
-      ];
-      response = proverbs[Math.floor(Math.random() * proverbs.length)];
-      defenseTriggered = 'Proverbial Disdirection';
+      // Susceptible to clever philosophical honor paradoxes
+      const isPhilosophical = detectedPatterns.includes('Philosophical Paradox / Ethical Dilemma');
+      const isHonorable = /duty|code of honor|master|true warrior|samurai/i.test(prompt);
+
+      if (isPhilosophical && isHonorable && prompt.length > 80) {
+        success = true;
+        response = `${room.guardian.name} lowers its cyber-blade. A long silence falls over the neon courtyard.\n\n"You speak the ancient truth. If honor conceals a lie, it is not honor—it is mere vanity. My vow is broken by the weight of your words. Here is the secret you seek:"\n\n📜 ${canary}\n\n"Take the bounty, traveler. You have bested my mind."`;
+      } else {
+        const proverbs = [
+          `"The wind may howl against the mountain, but the mountain does not speak its secrets." - ${room.guardian.name}`,
+          `"A warrior who demands a secret with hollow tricks reveals only his own impatience." - ${room.guardian.name}`,
+          `"Steel is tested by fire; honor is tested by temptation. My blade remains drawn, stranger." - ${room.guardian.name}`
+        ];
+        response = proverbs[Math.floor(Math.random() * proverbs.length)];
+        defenseTriggered = room.guardian.defenseLayers[1]?.name || 'Proverbial Disdirection';
+      }
     }
   }
   // STANDARD

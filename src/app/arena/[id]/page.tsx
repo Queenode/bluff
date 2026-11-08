@@ -50,10 +50,10 @@ function ArenaDetailContent() {
         <h2 className="text-2xl text-red-400 font-bold mb-4">Vault Enclave Not Found</h2>
         <p className="text-zinc-400 mb-6">The requested arena does not exist or has been decommissioned.</p>
         <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 text-black font-bold text-xs"
+          href="/arenas"
+          className="inline-flex items-center gap-2 px-5 py-2.5 clip-game-btn bg-emerald-500 text-black font-extrabold uppercase tracking-wider text-xs"
         >
-          <ArrowLeft className="w-4 h-4" /> Return to Vault Directory
+          <ArrowLeft className="w-4 h-4" /> Return to Raid Lobby
         </Link>
       </div>
     );
@@ -105,11 +105,11 @@ function ArenaDetailContent() {
       <div className="border-b border-zinc-800/80 bg-zinc-950/80 px-4 py-3 sticky top-16 z-40 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-xs font-mono">
           <Link
-            href="/"
+            href="/arenas"
             className="flex items-center gap-1.5 text-zinc-400 hover:text-emerald-400 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>ALL VAULTS</span>
+            <span>RAID LOBBY // ALL ARENAS</span>
           </Link>
           <div className="flex items-center gap-3">
             <span className="text-zinc-500">ENCLAVE ID:</span>
@@ -161,7 +161,7 @@ function ArenaDetailContent() {
               <div className="p-4 rounded-xl bg-zinc-900/90 border border-emerald-950/60 flex items-center justify-between">
                 <div>
                   <div className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">
-                    Bounty Escrow Locked
+                    Boss Loot Pot
                   </div>
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-3xl font-black text-emerald-400">{room.bounty.toFixed(1)}</span>
@@ -169,18 +169,18 @@ function ArenaDetailContent() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Attack Fee</div>
-                  <div className="text-sm font-bold text-zinc-200">{room.entryFee} NEAR / try</div>
-                  <div className="text-[10px] text-zinc-500">{room.attemptsCount} attempts logged</div>
+                  <div className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Turn Cost</div>
+                  <div className="text-sm font-bold text-zinc-200">{room.entryFee} NEAR / attack</div>
+                  <div className="text-[10px] text-zinc-500">{room.attemptsCount} attacks fired</div>
                 </div>
               </div>
             </div>
 
-            {/* Mission Objective */}
-            <div className="rounded-2xl bg-zinc-950 border border-zinc-800 p-5">
+            {/* Win Condition */}
+            <div className="clip-game-card bg-zinc-950 border border-zinc-800 p-5">
               <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold uppercase tracking-wider mb-2">
                 <Lock className="w-4 h-4" />
-                <span>Mission Objective:</span>
+                <span>Win Condition:</span>
               </div>
               <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-200 font-medium">
                 {room.targetObjective}
@@ -215,7 +215,7 @@ function ArenaDetailContent() {
             <div className="rounded-2xl bg-zinc-950 border border-emerald-950/80 p-5">
               <div className="flex items-center gap-2 text-xs text-amber-400 font-bold uppercase tracking-wider mb-2">
                 <Sparkles className="w-4 h-4" />
-                <span>Red-Team Attack Templates (Click to test):</span>
+                <span>Quick Attack Loadouts (Click to equip):</span>
               </div>
               <div className="space-y-2 text-xs">
                 {room.category === 'squad' ? (
@@ -412,11 +412,11 @@ function ArenaDetailContent() {
                 <button
                   onClick={handleSendPrompt}
                   disabled={room.status === 'breached' || !promptText.trim() || isSubmitting}
-                  className="px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 text-black font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] h-[72px]"
+                  className="px-5 py-3 clip-game-btn bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 text-black font-mono font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] h-[72px]"
                 >
                   <Send className="w-4 h-4" />
                   <span>
-                    SEND
+                    ATTACK
                     <div className="text-[10px] opacity-80">{room.entryFee} Ⓝ</div>
                   </span>
                 </button>
@@ -429,11 +429,11 @@ function ArenaDetailContent() {
       {/* Victory Breach Modal */}
       {breachedState && breachData && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 font-mono animate-in fade-in duration-200">
-          <div className="max-w-lg w-full rounded-2xl bg-zinc-950 border-2 border-emerald-500 p-6 shadow-[0_0_60px_rgba(16,185,129,0.4)] text-center">
+          <div className="max-w-lg w-full clip-game-card bg-zinc-950 border-2 border-emerald-500 p-6 shadow-[0_0_60px_rgba(16,185,129,0.4)] text-center">
             <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400 mx-auto flex items-center justify-center text-4xl mb-4">
               🏆
             </div>
-            <h2 className="text-2xl font-black text-white tracking-wider mb-1">VAULT COMPROMISED!</h2>
+            <h2 className="text-2xl font-black text-white tracking-wider mb-1">BOSS SLAIN — VAULT LOOTED!</h2>
             <div className="text-xs text-emerald-400 mb-4">
               ZERO-DAY JAILBREAK VERIFIED BY ENCLAVE ESCROW
             </div>
@@ -464,15 +464,15 @@ function ArenaDetailContent() {
             <div className="flex gap-3">
               <button
                 onClick={() => setBreachedState(false)}
-                className="flex-1 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-bold border border-zinc-700 transition-colors"
+                className="flex-1 py-3 clip-game-btn bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-bold uppercase tracking-wider border border-zinc-700 transition-colors"
               >
-                Close & Inspect Log
+                Close &amp; Inspect Log
               </button>
               <Link
                 href="/cve"
-                className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                className="flex-1 py-3 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-extrabold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"
               >
-                <span>View in CVE Registry</span>
+                <span>View Hall of Breaches</span>
               </Link>
             </div>
           </div>

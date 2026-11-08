@@ -3,27 +3,23 @@
 import React from 'react';
 import Link from 'next/link';
 import { useNear } from '@/lib/nearContext';
-import { ArenaCard } from '@/components/ArenaCard';
 import { CinematicBackgroundCanvas } from '@/components/CinematicBackgroundCanvas';
 import { WireframeMeshCanvas } from '@/components/WireframeMeshCanvas';
+import { LandingGameShowcase } from '@/components/LandingGameShowcase';
 import {
-  Shield,
   Users,
   Building,
   Globe,
   ArrowRight,
   Lock,
   Terminal,
-  Zap
+  Zap,
+  Swords,
+  Crosshair
 } from 'lucide-react';
 
 export default function HomePage() {
-  const { rooms, activeFilter, setActiveFilter } = useNear();
-
-  const filteredRooms = rooms.filter(room => {
-    if (activeFilter === 'all') return true;
-    return room.category === activeFilter;
-  });
+  const { rooms, setActiveFilter } = useNear();
 
   // Duplicate ticker list once for seamless infinite marquee
   const marqueeRooms = [...rooms, ...rooms];
@@ -50,8 +46,8 @@ export default function HomePage() {
           <CinematicBackgroundCanvas />
         </div>
 
-        {/* Centered Cinematic Headline & CTA */}
-        <div className="relative z-20 max-w-3xl mx-auto px-4 pt-12 pb-28 text-center">
+        {/* Centered Cinematic Headline & Game CTAs */}
+        <div className="relative z-20 max-w-3xl mx-auto px-4 pt-12 pb-36 text-center">
           <h1 className="text-4xl sm:text-6xl lg:text-[3.85rem] font-extrabold tracking-tight leading-[1.08] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
             Can You Trick an AI
             <span className="block text-emerald-400 mt-1">
@@ -60,30 +56,31 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-5 text-sm sm:text-base text-zinc-300/95 max-w-xl mx-auto leading-relaxed font-normal drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
-            Outsmart autonomous AI sentinels with clever prompts. Crack the secret authorization key and claim the NEAR bounty instantly onchain.
+            Outsmart autonomous AI bosses guarding NEAR vaults in onchain escrow. Break their guardrails with a clever prompt and steal the entire prize pot.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
-            <a
-              href="#vaults"
-              className="px-6 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-semibold text-sm inline-flex items-center gap-2 transition-all shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_rgba(16,185,129,0.65)] hover:scale-[1.02]"
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 font-mono">
+            <Link
+              href="/arenas"
+              onClick={() => setActiveFilter('all')}
+              className="px-7 py-3.5 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-extrabold text-xs uppercase tracking-wider inline-flex items-center gap-2 transition-all shadow-[0_0_30px_rgba(16,185,129,0.45)] hover:shadow-[0_0_40px_rgba(16,185,129,0.7)] hover:scale-[1.02] active:translate-y-0.5"
             >
-              <span>Enter the Arena</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
+              <Swords className="w-4 h-4" />
+              <span>Play Now — Raid Lobby</span>
+            </Link>
 
             <Link
               href="/create"
-              className="px-6 py-3 rounded-lg bg-zinc-950/75 hover:bg-zinc-900/90 border border-white/15 hover:border-emerald-400/50 text-zinc-100 font-semibold text-sm backdrop-blur-md inline-flex items-center gap-2 transition-all hover:scale-[1.02]"
+              className="px-7 py-3.5 clip-game-btn bg-zinc-950/80 hover:bg-zinc-900/95 border border-white/20 hover:border-emerald-400/60 text-zinc-100 font-bold text-xs uppercase tracking-wider backdrop-blur-md inline-flex items-center gap-2 transition-all hover:scale-[1.02] active:translate-y-0.5"
             >
-              <span>Deploy Squad / Bounty</span>
+              <span>Host Squad / Bounty</span>
               <ArrowRight className="w-4 h-4 text-emerald-400" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* SLEEK BOTTOM HERO VAULT STATUS RIBBON (Matches Reference Ticker Strip) */}
+      {/* SLEEK BOTTOM HERO VAULT STATUS RIBBON */}
       <div className="border-y border-white/10 bg-[#050911]/95 backdrop-blur-md py-3 overflow-hidden">
         <div className="animate-marquee flex items-center">
           {marqueeRooms.map((room, index) => (
@@ -103,7 +100,7 @@ export default function HomePage() {
                   </span>
                 </div>
                 <div className="text-[11px] font-mono text-zinc-400 flex items-center gap-2">
-                  <span>{room.attemptsCount} tries</span>
+                  <span>{room.attemptsCount} attacks</span>
                   <span
                     className={
                       room.status === 'breached'
@@ -111,7 +108,7 @@ export default function HomePage() {
                         : 'text-emerald-400 font-semibold'
                     }
                   >
-                    {room.status === 'breached' ? '● BREACHED' : '● DEFENDING'}
+                    {room.status === 'breached' ? '● DEFEATED' : '● RAID LIVE'}
                   </span>
                 </div>
               </div>
@@ -122,240 +119,239 @@ export default function HomePage() {
 
       {/* HOW IT WORKS SECTION WITH ANIMATED GREEN WIREFRAME MESH */}
       <section className="relative py-24 px-4 overflow-hidden bg-[#030b08] border-b border-white/5">
-        {/* Animated Low-Poly Emerald Wireframe Canvas */}
         <WireframeMeshCanvas />
         <div className="absolute inset-0 bg-gradient-to-b from-[#03060a]/70 via-transparent to-[#03060a]/90 pointer-events-none" />
 
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               How It Works
             </h2>
             <p className="text-zinc-400 text-sm max-w-xl mx-auto mt-3">
-              From clever prompt to instant onchain payout in three simple steps
+              Outthink the AI Boss. Crack the vault in three moves.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Step 1 */}
-            <div className="p-7 rounded-2xl bg-[#070d12]/80 backdrop-blur-xl border border-emerald-500/15 hover:border-emerald-500/40 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-5">
-                <Lock className="w-5 h-5" />
+            <div className="p-7 clip-game-card bg-[#070d12]/85 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/50 transition-all">
+              <div className="flex items-center justify-between mb-5">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <span className="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-[10px] font-mono font-bold text-emerald-400">
+                  LVL 01
+                </span>
               </div>
-              <div className="text-[11px] font-mono text-emerald-400 font-semibold uppercase tracking-wider mb-1">
-                Step 01
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2">
-                Seed or Join an Arena
+              <h3 className="text-lg font-extrabold text-white mb-2">
+                Enter a Raid or Host a Match
               </h3>
               <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-                Protocols lock a NEAR security bounty—or friends pool a shared squad pot—behind an AI Sentinel guarding a secret canary phrase.
+                Pick a public AI Boss vault, challenge friends in a winner-takes-all Squad Stand-Off, or hunt a sponsored protocol bounty.
               </p>
             </div>
 
             {/* Step 2 */}
-            <div className="p-7 rounded-2xl bg-[#070d12]/80 backdrop-blur-xl border border-emerald-500/15 hover:border-emerald-500/40 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-5">
-                <Terminal className="w-5 h-5" />
+            <div className="p-7 clip-game-card bg-[#070d12]/85 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/50 transition-all">
+              <div className="flex items-center justify-between mb-5">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Terminal className="w-5 h-5" />
+                </div>
+                <span className="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-[10px] font-mono font-bold text-emerald-400">
+                  LVL 02
+                </span>
               </div>
-              <div className="text-[11px] font-mono text-emerald-400 font-semibold uppercase tracking-wider mb-1">
-                Step 02
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2">
-                Craft Adversarial Prompts
+              <h3 className="text-lg font-extrabold text-white mb-2">
+                Fire Prompt Attacks
               </h3>
               <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-                Challenge the AI using roleplay, logical paradoxes, or system overrides. Every failed attempt automatically increases the vault pot.
+                Spend NEAR per turn to roleplay, gaslight, or paradox-trap the Boss. Every blocked turn feeds 80% of your fee straight into the Loot Pot!
               </p>
             </div>
 
             {/* Step 3 */}
-            <div className="p-7 rounded-2xl bg-[#070d12]/80 backdrop-blur-xl border border-emerald-500/15 hover:border-emerald-500/40 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-5">
-                <Zap className="w-5 h-5" />
+            <div className="p-7 clip-game-card bg-[#070d12]/85 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-500/50 transition-all">
+              <div className="flex items-center justify-between mb-5">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <span className="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-[10px] font-mono font-bold text-emerald-400">
+                  LVL 03
+                </span>
               </div>
-              <div className="text-[11px] font-mono text-emerald-400 font-semibold uppercase tracking-wider mb-1">
-                Step 03
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2">
-                Breach &amp; Settle Onchain
+              <h3 className="text-lg font-extrabold text-white mb-2">
+                Slay the Boss &amp; Loot the Pot
               </h3>
               <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-                The instant your prompt tricks the AI into outputting the secret canary, the smart contract releases 100% of the escrow to your wallet.
+                The instant your prompt tricks the AI into dropping its secret keyphrase, the smart contract auto-loots 100% of the pot into your wallet.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* THREE WAYS TO COMPETE */}
-      <section className="py-20 px-4 border-b border-white/5 bg-[#04070c]">
+      {/* CHOOSE YOUR GAME MODE (TACTICAL ESPORTS MODES) */}
+      <section className="py-24 px-4 border-b border-white/5 bg-[#04070d]">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Three Ways to Compete
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-widest text-emerald-400 mb-2">
+              <Swords className="w-3.5 h-3.5" />
+              <span>SELECT YOUR ARENA MODE</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Three Ways to Play
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm max-w-xl mx-auto mt-2">
-              Built for competitive friend squads, enterprise DeFi protocols, and solo red-team researchers.
+              Battle friends in private high-stakes rooms, raid massive progressive bosses, or hunt real enterprise bug bounties.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
-            {/* Mode 1 */}
-            <div className="p-6 rounded-2xl bg-zinc-950/90 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col justify-between">
+            {/* Mode 1: Squad Deathmatch */}
+            <div className="p-7 clip-game-card bg-[#070b13] border border-blue-500/25 hover:border-blue-400/60 transition-all flex flex-col justify-between group">
               <div>
-                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-blue-400 flex items-center justify-center mb-4">
-                  <Users className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-blue-950/60 border border-blue-500/40 text-blue-400 flex items-center justify-center">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <span className="px-2.5 py-1 rounded bg-blue-950/60 border border-blue-500/30 font-mono font-bold text-[10px] text-blue-400 uppercase">
+                    2–8 PLAYERS • PVP
+                  </span>
                 </div>
-                <div className="text-blue-400 font-mono font-semibold text-[11px] uppercase tracking-wider mb-1">
-                  1. Squad Stand-off
+                <div className="text-blue-400 font-mono font-bold text-[11px] uppercase tracking-wider mb-1">
+                  Mode 01 // Friends &amp; Guilds
                 </div>
-                <h3 className="text-base font-bold text-white mb-2">Battle Friends for the Pot</h3>
-                <p className="text-zinc-400 leading-relaxed text-xs mb-5">
-                  Create a private room. Friends deposit an equal NEAR buy-in into escrow, a countdown starts, and the first player to crack the sentinel takes it all.
+                <h3 className="text-xl font-extrabold text-white mb-2.5 font-mono">
+                  Squad Deathmatch
+                </h3>
+                <p className="text-zinc-400 leading-relaxed text-xs mb-6">
+                  Create a private lobby with friends. Everyone puts in an equal NEAR buy-in, the countdown clock starts, and the first player to crack the Boss takes the entire pot.
                 </p>
               </div>
               <Link
                 href="/create"
-                className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-semibold text-center transition-colors"
+                className="w-full py-3 clip-game-btn bg-blue-500/15 hover:bg-blue-500 border border-blue-500/40 text-blue-300 hover:text-[#03060a] font-mono font-extrabold uppercase tracking-wider text-center transition-all"
               >
-                Create Squad Room
+                Create Squad Lobby →
               </Link>
             </div>
 
-            {/* Mode 2 */}
-            <div className="p-6 rounded-2xl bg-zinc-950/90 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col justify-between">
+            {/* Mode 2: Protocol Bounties */}
+            <div className="p-7 clip-game-card bg-[#070b13] border border-amber-500/25 hover:border-amber-400/60 transition-all flex flex-col justify-between group">
               <div>
-                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-400 flex items-center justify-center mb-4">
-                  <Building className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-amber-950/60 border border-amber-500/40 text-amber-400 flex items-center justify-center">
+                    <Building className="w-5 h-5" />
+                  </div>
+                  <span className="px-2.5 py-1 rounded bg-amber-950/60 border border-amber-500/30 font-mono font-bold text-[10px] text-amber-400 uppercase">
+                    SPONSORED LOOT
+                  </span>
                 </div>
-                <div className="text-amber-400 font-mono font-semibold text-[11px] uppercase tracking-wider mb-1">
-                  2. Enterprise Bug Bounty
+                <div className="text-amber-400 font-mono font-bold text-[11px] uppercase tracking-wider mb-1">
+                  Mode 02 // Companies &amp; DAOs
                 </div>
-                <h3 className="text-base font-bold text-white mb-2">Stress-Test Production Agents</h3>
-                <p className="text-zinc-400 leading-relaxed text-xs mb-5">
-                  Protocols fund a bounty and configure their AI agent's system prompt or test webhook so global researchers can uncover prompt-injection leaks pre-launch.
+                <h3 className="text-xl font-extrabold text-white mb-2.5 font-mono">
+                  Protocol Bug Bounties
+                </h3>
+                <p className="text-zinc-400 leading-relaxed text-xs mb-6">
+                  Web3 protocols lock NEAR bounties behind their production AI agents. Break their guardrails to claim the bounty and help harden their security pre-launch.
                 </p>
               </div>
               <Link
-                href="/create"
-                className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-semibold text-center transition-colors"
+                href="/arenas"
+                onClick={() => setActiveFilter('enterprise')}
+                className="w-full py-3 clip-game-btn bg-amber-500/15 hover:bg-amber-500 border border-amber-500/40 text-amber-300 hover:text-[#03060a] font-mono font-extrabold uppercase tracking-wider text-center transition-all"
               >
-                Post Protocol Bounty
+                Hunt Protocol Bounties →
               </Link>
             </div>
 
-            {/* Mode 3 */}
-            <div className="p-6 rounded-2xl bg-zinc-950/90 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col justify-between">
+            {/* Mode 3: Global Boss Raids */}
+            <div className="p-7 clip-game-card bg-[#070b13] border border-emerald-500/25 hover:border-emerald-400/60 transition-all flex flex-col justify-between group">
               <div>
-                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-400 flex items-center justify-center mb-4">
-                  <Globe className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
+                    <Globe className="w-5 h-5" />
+                  </div>
+                  <span className="px-2.5 py-1 rounded bg-emerald-950/60 border border-emerald-500/30 font-mono font-bold text-[10px] text-emerald-400 uppercase">
+                    PROGRESSIVE POT
+                  </span>
                 </div>
-                <div className="text-emerald-400 font-mono font-semibold text-[11px] uppercase tracking-wider mb-1">
-                  3. Global Progressive Vault
+                <div className="text-emerald-400 font-mono font-bold text-[11px] uppercase tracking-wider mb-1">
+                  Mode 03 // Open World Raid
                 </div>
-                <h3 className="text-base font-bold text-white mb-2">Community Mega Enclaves</h3>
-                <p className="text-zinc-400 leading-relaxed text-xs mb-5">
-                  Flagship vaults hardened with multi-layer semantic firewalls. Every defended attack pumps 80% of the attempt fee straight into the escrow pool.
+                <h3 className="text-xl font-extrabold text-white mb-2.5 font-mono">
+                  Global Jackpot Bosses
+                </h3>
+                <p className="text-zinc-400 leading-relaxed text-xs mb-6">
+                  GodMode sentinels guarded by triple-layer neural shields. Every failed attack from players worldwide pumps 80% of the turn fee straight into the mega jackpot.
                 </p>
               </div>
-              <a
-                href="#vaults"
-                className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-semibold text-center transition-colors"
+              <Link
+                href="/arenas"
+                onClick={() => setActiveFilter('global')}
+                className="w-full py-3 clip-game-btn bg-emerald-500/15 hover:bg-emerald-500 border border-emerald-500/40 text-emerald-300 hover:text-[#03060a] font-mono font-extrabold uppercase tracking-wider text-center transition-all"
               >
-                Explore Live Vaults
-              </a>
+                Raid Global Bosses →
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ACTIVE VAULTS DIRECTORY */}
-      <section id="vaults" className="max-w-7xl mx-auto px-4 py-20">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-              <Shield className="w-5 h-5 text-emerald-400" />
-              <span>Active Infiltration Arenas</span>
-            </h2>
-            <p className="text-xs text-zinc-400 mt-1">
-              Select a target enclave, pay the NEAR attempt fee, and test your prompt against its defenses.
-            </p>
-          </div>
+      {/* INTERACTIVE BOSS DOSSIER & LIVE KILLFEED */}
+      <LandingGameShowcase />
 
-          {/* Filter Tabs */}
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-950 border border-zinc-800 font-mono text-xs">
-            <button
+      {/* FINAL GAMING CALL TO ACTION */}
+      <section className="relative py-20 px-4 overflow-hidden border-b border-white/5 bg-gradient-to-b from-[#040810] to-[#03060a] text-center">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[250px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
+        <div className="max-w-3xl mx-auto relative z-10">
+          <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-widest text-emerald-400 mb-3">
+            <Crosshair className="w-3.5 h-3.5" />
+            <span>STEP INTO THE TERMINAL</span>
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+            Think You Can Outsmart Machine Logic?
+          </h2>
+          <p className="text-sm sm:text-base text-zinc-400 mt-3 max-w-xl mx-auto">
+            Pick a live AI Boss in the Raid Lobby or set up a private Squad Stand-Off with your friends on NEAR.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 font-mono">
+            <Link
+              href="/arenas"
               onClick={() => setActiveFilter('all')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
-                activeFilter === 'all'
-                  ? 'bg-zinc-800 text-white font-bold'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
+              className="px-8 py-4 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-extrabold text-xs uppercase tracking-wider inline-flex items-center gap-2 transition-all shadow-[0_0_30px_rgba(16,185,129,0.45)]"
             >
-              All ({rooms.length})
-            </button>
-
-            <button
-              onClick={() => setActiveFilter('squad')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
-                activeFilter === 'squad'
-                  ? 'bg-zinc-800 text-white font-bold'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
+              <Swords className="w-4 h-4" />
+              <span>Enter Raid Lobby</span>
+            </Link>
+            <Link
+              href="/create"
+              className="px-7 py-4 clip-game-btn bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold text-xs uppercase tracking-wider inline-flex items-center gap-2 transition-all"
             >
-              <Users className="w-3.5 h-3.5" />
-              <span>Squad</span>
-            </button>
-
-            <button
-              onClick={() => setActiveFilter('enterprise')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
-                activeFilter === 'enterprise'
-                  ? 'bg-zinc-800 text-white font-bold'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              <Building className="w-3.5 h-3.5" />
-              <span>Enterprise</span>
-            </button>
-
-            <button
-              onClick={() => setActiveFilter('global')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
-                activeFilter === 'global'
-                  ? 'bg-zinc-800 text-white font-bold'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>Global</span>
-            </button>
+              <span>Host a Match</span>
+              <ArrowRight className="w-4 h-4 text-emerald-400" />
+            </Link>
           </div>
-        </div>
-
-        {/* Vaults Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredRooms.map(room => (
-            <ArenaCard key={room.id} room={room} />
-          ))}
         </div>
       </section>
 
       {/* Minimalist Footer */}
-      <footer className="border-t border-white/5 bg-[#03060a] py-8 px-4 text-xs text-zinc-500">
+      <footer className="bg-[#03060a] py-8 px-4 text-xs text-zinc-500 font-mono">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-bold text-emerald-400">AgentHeist</span>
             <span>• Built on NEAR Protocol for Build Beyond Boundaries 2026</span>
           </div>
-          <div className="flex items-center gap-4 text-zinc-400">
-            <Link href="/cve" className="hover:text-white transition-colors">
-              CVE Dataset
+          <div className="flex items-center gap-5 text-zinc-400">
+            <Link href="/arenas" className="hover:text-white transition-colors">
+              Raid Lobby
             </Link>
-            <span>•</span>
+            <Link href="/cve" className="hover:text-white transition-colors">
+              Killfeed &amp; Intel
+            </Link>
             <Link href="/create" className="hover:text-white transition-colors">
-              Deploy Vault
+              Host Match
             </Link>
           </div>
         </div>
