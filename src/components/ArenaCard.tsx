@@ -18,25 +18,25 @@ export const ArenaCard: React.FC<ArenaCardProps> = ({ room }) => {
         return {
           lvl: 'LVL 99',
           bars: 4,
-          color: 'bg-purple-400',
-          text: 'text-purple-300',
-          border: 'border-purple-500/40 bg-purple-950/60'
+          color: 'bg-emerald-400',
+          text: 'text-emerald-300',
+          border: 'border-emerald-500/40 bg-emerald-950/60'
         };
       case 'Fortress':
         return {
           lvl: 'LVL 75',
           bars: 3,
-          color: 'bg-amber-400',
-          text: 'text-amber-300',
-          border: 'border-amber-500/40 bg-amber-950/60'
+          color: 'bg-emerald-400',
+          text: 'text-emerald-300',
+          border: 'border-emerald-500/40 bg-emerald-950/60'
         };
       case 'Hardened':
         return {
           lvl: 'LVL 50',
           bars: 2,
-          color: 'bg-cyan-400',
-          text: 'text-cyan-300',
-          border: 'border-cyan-500/40 bg-cyan-950/60'
+          color: 'bg-emerald-400',
+          text: 'text-emerald-300',
+          border: 'border-emerald-500/40 bg-emerald-950/60'
         };
       default:
         return {
@@ -54,23 +54,23 @@ export const ArenaCard: React.FC<ArenaCardProps> = ({ room }) => {
       case 'squad':
         return {
           label: 'SQUAD DEATHMATCH',
-          icon: <Users className="w-3 h-3 text-blue-400" />,
-          color: 'text-blue-400 border-blue-500/30 bg-blue-950/40',
-          accent: 'from-blue-500 to-cyan-400'
+          icon: <Users className="w-3 h-3 text-emerald-400" />,
+          color: 'text-emerald-300 border-emerald-500/30 bg-emerald-950/40',
+          accent: 'from-emerald-500 to-teal-400'
         };
       case 'enterprise':
         return {
           label: 'PROTOCOL BOUNTY',
-          icon: <Building className="w-3 h-3 text-amber-400" />,
-          color: 'text-amber-400 border-amber-500/30 bg-amber-950/40',
-          accent: 'from-amber-500 to-orange-400'
+          icon: <Building className="w-3 h-3 text-emerald-400" />,
+          color: 'text-emerald-300 border-emerald-500/30 bg-emerald-950/40',
+          accent: 'from-emerald-500 to-teal-400'
         };
       default:
         return {
           label: 'GLOBAL RAID BOSS',
           icon: <Globe className="w-3 h-3 text-emerald-400" />,
-          color: 'text-emerald-400 border-emerald-500/30 bg-emerald-950/40',
-          accent: 'from-emerald-500 to-teal-300'
+          color: 'text-emerald-300 border-emerald-500/30 bg-emerald-950/40',
+          accent: 'from-emerald-500 to-teal-400'
         };
     }
   };

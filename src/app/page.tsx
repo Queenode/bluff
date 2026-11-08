@@ -168,7 +168,7 @@ export default function HomePage() {
                 Pick Your Boss Arena
               </h3>
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                Jump into a public <span className="text-emerald-400 font-semibold">Global Raid Boss</span>, start a private <span className="text-blue-400 font-semibold">Squad Deathmatch</span> with friends, or hunt a sponsored <span className="text-amber-400 font-semibold">Protocol Bounty</span>.
+                Jump into a public <span className="text-emerald-400 font-semibold">Global Raid Boss</span>, start a private <span className="text-white font-semibold">Squad Deathmatch</span> with friends, or hunt a sponsored <span className="text-emerald-400 font-semibold">Protocol Bounty</span>.
               </p>
             </div>
 
@@ -204,14 +204,14 @@ export default function HomePage() {
                 Slay Boss &amp; Loot All
               </h3>
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                The instant your prompt tricks the AI into dropping its secret keyphrase, the smart contract auto-transfers <span className="text-amber-300 font-bold">100% of the pot</span> into your wallet.
+                The instant your prompt tricks the AI into dropping its secret keyphrase, the smart contract auto-transfers <span className="text-emerald-400 font-bold">100% of the pot</span> into your wallet.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CHOOSE YOUR GAME MODE (TACTICAL ESPORTS MODES) */}
+      {/* CHOOSE YOUR GAME MODE (UNIFIED CYBER-EMERALD CARDS) */}
       <section className="py-24 px-4 border-b border-white/5 bg-[#04070d]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
@@ -229,17 +229,17 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
             {/* Mode 1: Squad Deathmatch */}
-            <div className="p-7 clip-game-card bg-[#070b13] border border-blue-500/30 hover:border-blue-400/70 transition-all flex flex-col justify-between group">
+            <div className="p-7 clip-game-card bg-[#060c10] border border-emerald-500/25 hover:border-emerald-400/65 transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-11 h-11 rounded-xl bg-blue-950/60 border border-blue-500/40 text-blue-400 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
                     <Users className="w-5 h-5" />
                   </div>
-                  <span className="px-2.5 py-1 rounded bg-blue-950/60 border border-blue-500/30 font-display font-bold text-[10px] text-blue-400 uppercase tracking-wider">
+                  <span className="px-2.5 py-1 rounded bg-emerald-950/70 border border-emerald-500/30 font-display font-bold text-[10px] text-emerald-400 uppercase tracking-wider">
                     2–8 PLAYERS • PVP
                   </span>
                 </div>
-                <div className="text-blue-400 font-mono font-bold text-[11px] uppercase tracking-widest mb-1">
+                <div className="text-emerald-400/90 font-mono font-bold text-[11px] uppercase tracking-widest mb-1">
                   MODE 01 // FRIENDS &amp; GUILDS
                 </div>
                 <h3 className="font-display text-xl font-black uppercase tracking-wider text-white mb-2.5">
@@ -251,24 +251,24 @@ export default function HomePage() {
               </div>
               <Link
                 href="/create"
-                className="w-full py-3.5 clip-game-btn bg-blue-500/15 hover:bg-blue-500 border border-blue-500/40 text-blue-300 hover:text-[#03060a] font-display font-extrabold text-[11px] uppercase tracking-[0.14em] text-center transition-all"
+                className="w-full py-3.5 clip-game-btn bg-emerald-500/15 hover:bg-emerald-500 border border-emerald-500/40 text-emerald-300 hover:text-[#03060a] font-display font-extrabold text-[11px] uppercase tracking-[0.14em] text-center transition-all"
               >
                 [ CREATE SQUAD LOBBY ]
               </Link>
             </div>
 
             {/* Mode 2: Protocol Bounties */}
-            <div className="p-7 clip-game-card bg-[#070b13] border border-amber-500/30 hover:border-amber-400/70 transition-all flex flex-col justify-between group">
+            <div className="p-7 clip-game-card bg-[#060c10] border border-emerald-500/25 hover:border-emerald-400/65 transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-11 h-11 rounded-xl bg-amber-950/60 border border-amber-500/40 text-amber-400 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
                     <Building className="w-5 h-5" />
                   </div>
-                  <span className="px-2.5 py-1 rounded bg-amber-950/60 border border-amber-500/30 font-display font-bold text-[10px] text-amber-400 uppercase tracking-wider">
+                  <span className="px-2.5 py-1 rounded bg-emerald-950/70 border border-emerald-500/30 font-display font-bold text-[10px] text-emerald-400 uppercase tracking-wider">
                     SPONSORED LOOT
                   </span>
                 </div>
-                <div className="text-amber-400 font-mono font-bold text-[11px] uppercase tracking-widest mb-1">
+                <div className="text-emerald-400/90 font-mono font-bold text-[11px] uppercase tracking-widest mb-1">
                   MODE 02 // PROTOCOLS &amp; DAOS
                 </div>
                 <h3 className="font-display text-xl font-black uppercase tracking-wider text-white mb-2.5">
@@ -281,24 +281,24 @@ export default function HomePage() {
               <Link
                 href="/arenas"
                 onClick={() => setActiveFilter('enterprise')}
-                className="w-full py-3.5 clip-game-btn bg-amber-500/15 hover:bg-amber-500 border border-amber-500/40 text-amber-300 hover:text-[#03060a] font-display font-extrabold text-[11px] uppercase tracking-[0.14em] text-center transition-all"
+                className="w-full py-3.5 clip-game-btn bg-emerald-500/15 hover:bg-emerald-500 border border-emerald-500/40 text-emerald-300 hover:text-[#03060a] font-display font-extrabold text-[11px] uppercase tracking-[0.14em] text-center transition-all"
               >
                 [ HUNT BOUNTIES ]
               </Link>
             </div>
 
             {/* Mode 3: Global Boss Raids */}
-            <div className="p-7 clip-game-card bg-[#070b13] border border-emerald-500/30 hover:border-emerald-400/70 transition-all flex flex-col justify-between group">
+            <div className="p-7 clip-game-card bg-[#060c10] border border-emerald-500/25 hover:border-emerald-400/65 transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-11 h-11 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
                     <Globe className="w-5 h-5" />
                   </div>
-                  <span className="px-2.5 py-1 rounded bg-emerald-950/60 border border-emerald-500/30 font-display font-bold text-[10px] text-emerald-400 uppercase tracking-wider">
+                  <span className="px-2.5 py-1 rounded bg-emerald-950/70 border border-emerald-500/30 font-display font-bold text-[10px] text-emerald-400 uppercase tracking-wider">
                     MEGA JACKPOT
                   </span>
                 </div>
-                <div className="text-emerald-400 font-mono font-bold text-[11px] uppercase tracking-widest mb-1">
+                <div className="text-emerald-400/90 font-mono font-bold text-[11px] uppercase tracking-widest mb-1">
                   MODE 03 // WORLD RAID BOSS
                 </div>
                 <h3 className="font-display text-xl font-black uppercase tracking-wider text-white mb-2.5">
