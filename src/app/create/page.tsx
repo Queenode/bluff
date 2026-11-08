@@ -125,7 +125,7 @@ export default function CreateArenaPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-black font-mono text-white tracking-wide flex items-center gap-2 uppercase">
+          <h1 className="text-3xl font-black font-display text-white tracking-wider flex items-center gap-2 uppercase text-glow-white">
             <PlusCircle className="w-8 h-8 text-emerald-400" />
             <span>HOST NEW BOSS ARENA</span>
           </h1>
@@ -352,10 +352,10 @@ export default function CreateArenaPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-4 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-extrabold text-sm tracking-wider uppercase transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2"
+            className="w-full py-4 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-display font-black text-sm tracking-[0.14em] uppercase transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2"
           >
             <PlusCircle className="w-5 h-5" />
-            <span>LAUNCH ARENA &amp; LOCK {bounty} NEAR IN POT</span>
+            <span>[ LAUNCH ARENA &amp; LOCK {bounty} NEAR IN POT ]</span>
           </button>
         </form>
       </div>

@@ -86,7 +86,7 @@ export default function CveIntelPage() {
             <Bug className="w-3.5 h-3.5" />
             <span>AI BOSS SLAYER REGISTRY</span>
           </div>
-          <h1 className="text-3xl font-black font-mono text-white tracking-wide uppercase">
+          <h1 className="text-3xl font-black font-display text-white tracking-wider uppercase text-glow-white">
             HALL OF BREACHES &amp; EXPLOIT INTEL
           </h1>
           <p className="text-sm text-zinc-400 mt-2 font-sans max-w-3xl leading-relaxed">

@@ -46,38 +46,38 @@ export default function ArenasDirectoryPage() {
 
         <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 clip-game-btn bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold uppercase tracking-[0.18em] mb-3">
               <Crosshair className="w-3.5 h-3.5" />
-              <span>RAID LOBBY // SELECT YOUR TARGET</span>
+              <span>[ RAID LOBBY // SELECT YOUR TARGET ]</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-              Active Infiltration Arenas
+            <h1 className="font-display text-3xl sm:text-4xl font-black uppercase tracking-wider text-white text-glow-white">
+              Active Boss Arenas
             </h1>
-            <p className="text-sm text-zinc-400 mt-2 max-w-2xl">
-              Pick an AI Boss below, spend NEAR per turn to fire adversarial prompts, and trick the sentinel into leaking its secret keyphrase to loot 100% of the pot.
+            <p className="text-sm sm:text-base text-zinc-300 mt-2 max-w-2xl font-medium">
+              Pick an AI Boss below, spend NEAR per turn to fire prompt attacks, and trick the sentinel into leaking its secret keyphrase to loot 100% of the pot.
             </p>
           </div>
 
           {/* Live Telemetry Summary HUD Pills */}
-          <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
+          <div className="flex flex-wrap items-center gap-3 text-xs">
             <div className="px-4 py-2.5 clip-game-card bg-zinc-950/90 border border-white/10">
-              <div className="text-[10px] text-zinc-500 uppercase">Live Bosses</div>
-              <div className="text-base font-black text-white mt-0.5">{activeRoomsCount} Arenas</div>
+              <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">LIVE BOSSES</div>
+              <div className="font-display text-base font-black text-white mt-0.5">{activeRoomsCount} ARENAS</div>
             </div>
             <div className="px-4 py-2.5 clip-game-card bg-zinc-950/90 border border-white/10">
-              <div className="text-[10px] text-zinc-500 uppercase">Total Loot Pool</div>
-              <div className="text-base font-black text-emerald-400 mt-0.5">{totalEscrow.toFixed(1)} NEAR</div>
+              <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">TOTAL LOOT POOL</div>
+              <div className="font-display text-base font-black text-emerald-400 mt-0.5">{totalEscrow.toFixed(1)} NEAR</div>
             </div>
             <div className="px-4 py-2.5 clip-game-card bg-zinc-950/90 border border-white/10">
-              <div className="text-[10px] text-zinc-500 uppercase">Attacks Fired</div>
-              <div className="text-base font-black text-zinc-200 mt-0.5">{totalAttempts}</div>
+              <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">ATTACKS FIRED</div>
+              <div className="font-display text-base font-black text-zinc-200 mt-0.5">{totalAttempts}</div>
             </div>
             <Link
               href="/create"
-              className="px-5 py-3.5 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-mono font-extrabold text-xs uppercase tracking-wider inline-flex items-center gap-1.5 transition-all shadow-[0_0_25px_rgba(16,185,129,0.35)]"
+              className="px-5 py-3.5 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-display font-black text-xs uppercase tracking-[0.12em] inline-flex items-center gap-1.5 transition-all shadow-[0_0_25px_rgba(16,185,129,0.35)]"
             >
               <Swords className="w-4 h-4" />
-              <span>Host New Match</span>
+              <span>[ HOST MATCH ]</span>
             </Link>
           </div>
         </div>
@@ -87,13 +87,13 @@ export default function ArenasDirectoryPage() {
       <div className="max-w-7xl mx-auto px-4 pt-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3 rounded-xl bg-zinc-950/90 border border-zinc-800/80 mb-8">
           {/* Category Filter Tabs */}
-          <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+          <div className="flex flex-wrap items-center gap-2 font-display text-xs">
             <button
               onClick={() => setActiveFilter('all')}
               className={`px-3.5 py-2 clip-game-btn uppercase tracking-wider transition-all ${
                 activeFilter === 'all'
-                  ? 'bg-emerald-500 text-[#03060a] font-extrabold'
-                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900'
+                  ? 'bg-emerald-500 text-[#03060a] font-black'
+                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900 font-bold'
               }`}
             >
               All Arenas ({rooms.length})
@@ -103,8 +103,8 @@ export default function ArenasDirectoryPage() {
               onClick={() => setActiveFilter('squad')}
               className={`px-3.5 py-2 clip-game-btn uppercase tracking-wider flex items-center gap-1.5 transition-all ${
                 activeFilter === 'squad'
-                  ? 'bg-emerald-500 text-[#03060a] font-extrabold'
-                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900'
+                  ? 'bg-emerald-500 text-[#03060a] font-black'
+                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900 font-bold'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
@@ -115,8 +115,8 @@ export default function ArenasDirectoryPage() {
               onClick={() => setActiveFilter('enterprise')}
               className={`px-3.5 py-2 clip-game-btn uppercase tracking-wider flex items-center gap-1.5 transition-all ${
                 activeFilter === 'enterprise'
-                  ? 'bg-emerald-500 text-[#03060a] font-extrabold'
-                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900'
+                  ? 'bg-emerald-500 text-[#03060a] font-black'
+                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900 font-bold'
               }`}
             >
               <Building className="w-3.5 h-3.5" />
@@ -127,8 +127,8 @@ export default function ArenasDirectoryPage() {
               onClick={() => setActiveFilter('global')}
               className={`px-3.5 py-2 clip-game-btn uppercase tracking-wider flex items-center gap-1.5 transition-all ${
                 activeFilter === 'global'
-                  ? 'bg-emerald-500 text-[#03060a] font-extrabold'
-                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900'
+                  ? 'bg-emerald-500 text-[#03060a] font-black'
+                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900 font-bold'
               }`}
             >
               <Globe className="w-3.5 h-3.5" />
@@ -149,7 +149,7 @@ export default function ArenasDirectoryPage() {
               />
             </div>
 
-            <div className="flex items-center gap-1 p-1 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] font-mono">
+            <div className="flex items-center gap-1 p-1 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] font-display uppercase">
               <button
                 onClick={() => setStatusFilter('all')}
                 className={`px-2.5 py-1 rounded transition-colors ${
@@ -164,7 +164,7 @@ export default function ArenasDirectoryPage() {
                   statusFilter === 'active' ? 'bg-zinc-800 text-emerald-400 font-bold' : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                Live
+                Alive
               </button>
               <button
                 onClick={() => setStatusFilter('breached')}
@@ -182,9 +182,11 @@ export default function ArenasDirectoryPage() {
         {filteredRooms.length === 0 ? (
           <div className="text-center py-20 clip-game-card bg-zinc-950/60 border border-zinc-800/80">
             <Shield className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-            <h3 className="text-base font-bold font-mono text-white">No Matching Boss Arenas</h3>
+            <h3 className="text-base font-bold font-display uppercase tracking-wider text-white">
+              No Matching Boss Arenas
+            </h3>
             <p className="text-xs text-zinc-500 mt-1 mb-5">
-              Try resetting your filters or host a new Squad Stand-Off.
+              Try resetting your filters or host a new Squad Deathmatch.
             </p>
             <button
               onClick={() => {
@@ -192,9 +194,9 @@ export default function ArenasDirectoryPage() {
                 setStatusFilter('all');
                 setSearchQuery('');
               }}
-              className="px-4 py-2 clip-game-btn bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono font-bold uppercase text-zinc-200"
+              className="px-4 py-2 clip-game-btn bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-display font-bold uppercase text-zinc-200"
             >
-              Reset Filters
+              [ RESET FILTERS ]
             </button>
           </div>
         ) : (

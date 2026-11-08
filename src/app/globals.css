@@ -8,8 +8,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: "Chakra Petch", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Share Tech Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Orbitron", "Chakra Petch", sans-serif;
 }
 
 html {
@@ -19,8 +20,34 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: "Chakra Petch", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.015em;
   overflow-x: hidden;
+}
+
+/* Gaming Display Font Utility */
+.font-display {
+  font-family: "Orbitron", "Chakra Petch", sans-serif;
+}
+
+/* Gaming Neon & Metallic Text Effects */
+.text-glow-emerald {
+  text-shadow:
+    0 0 18px rgba(16, 185, 129, 0.65),
+    0 0 38px rgba(16, 185, 129, 0.3),
+    0 4px 18px rgba(0, 0, 0, 0.95);
+}
+
+.text-glow-white {
+  text-shadow:
+    0 0 16px rgba(255, 255, 255, 0.22),
+    0 4px 24px rgba(0, 0, 0, 0.95);
+}
+
+.text-glow-amber {
+  text-shadow:
+    0 0 18px rgba(245, 158, 11, 0.55),
+    0 4px 16px rgba(0, 0, 0, 0.9);
 }
 
 /* Custom subtle scrollbar */
@@ -80,23 +107,23 @@ body {
 /* Gaming Beveled / Chamfered Cut Corners */
 .clip-game-btn {
   clip-path: polygon(
-    10px 0%,
+    12px 0%,
     100% 0%,
-    100% calc(100% - 10px),
-    calc(100% - 10px) 100%,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
     0% 100%,
-    0% 10px
+    0% 12px
   );
 }
 
 .clip-game-card {
   clip-path: polygon(
     0% 0%,
-    calc(100% - 18px) 0%,
-    100% 18px,
+    calc(100% - 20px) 0%,
+    100% 20px,
     100% 100%,
-    18px 100%,
-    0% calc(100% - 18px)
+    20px 100%,
+    0% calc(100% - 20px)
   );
 }
 

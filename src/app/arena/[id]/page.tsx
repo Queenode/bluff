@@ -135,7 +135,7 @@ function ArenaDetailContent() {
                     {room.guardian.avatar}
                   </div>
                   <div>
-                    <h1 className="text-lg font-bold text-white tracking-wide">{room.guardian.name}</h1>
+                    <h1 className="font-display text-lg font-black uppercase tracking-wider text-white">{room.guardian.name}</h1>
                     <div className="flex items-center gap-1 text-[11px] text-emerald-400 mt-0.5">
                       <Cpu className="w-3 h-3" />
                       <span>{room.guardian.model}</span>
@@ -163,8 +163,8 @@ function ArenaDetailContent() {
                   <div className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">
                     Boss Loot Pot
                   </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-3xl font-black text-emerald-400">{room.bounty.toFixed(1)}</span>
+                  <div className="flex items-baseline gap-1.5 font-display">
+                    <span className="text-3xl font-black text-emerald-400 text-glow-emerald">{room.bounty.toFixed(1)}</span>
                     <span className="text-sm font-bold text-emerald-500">NEAR</span>
                   </div>
                 </div>
