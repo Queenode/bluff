@@ -42,17 +42,18 @@ body {
   background: #10b981;
 }
 
-/* Subtle cinematic breathing zoom for hero backdrop */
+/* Subtle cinematic breathing zoom anchored at bottom so vault coins stay framed */
 @keyframes ken-burns-subtle {
   0% {
     transform: scale(1);
   }
   100% {
-    transform: scale(1.06);
+    transform: scale(1.03);
   }
 }
 
 .animate-hero-breath {
+  transform-origin: 50% 85%;
   animation: ken-burns-subtle 18s ease-in-out infinite alternate;
 }
 
