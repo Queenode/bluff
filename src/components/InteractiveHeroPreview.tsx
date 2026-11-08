@@ -174,3 +174,4 @@ export const InteractiveHeroPreview: React.FC = () => {
     </div>
   );
 };
+
