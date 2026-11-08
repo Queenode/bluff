@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useNear } from '@/lib/nearContext';
 import { ArenaCard } from '@/components/ArenaCard';
-import { HeroConsolePreview } from '@/components/HeroConsolePreview';
+import { CinematicVaultMonolith } from '@/components/CinematicVaultMonolith';
 import {
   Shield,
   Zap,
@@ -14,7 +14,6 @@ import {
   Plus,
   ArrowRight,
   Layers,
-  CheckCircle2,
   Lock,
   Cpu
 } from 'lucide-react';
@@ -35,72 +34,76 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-emerald-500 selection:text-black">
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-20 px-4 text-center overflow-hidden border-b border-zinc-900 bg-radial-[at_top_center] from-zinc-900/40 via-black to-black">
-        <div className="max-w-5xl mx-auto space-y-8">
-          {/* Tag */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-mono">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>NEAR Hackathon 2026 • AI Security &amp; Escrow Arena</span>
+      {/* Cinematic Hero Section */}
+      <section className="relative pt-24 pb-28 px-4 text-center overflow-hidden border-b border-zinc-900 cinematic-grid">
+        {/* Massive Ambient Celestial Spotlight */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-emerald-500/10 blur-[180px] rounded-full pointer-events-none animate-atmosphere" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-cyan-500/10 blur-[140px] rounded-full pointer-events-none" />
+
+        <div className="max-w-5xl mx-auto relative z-10 space-y-10">
+          {/* Filmic Category Tag */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-950/90 border border-zinc-800 text-zinc-400 text-[11px] font-mono tracking-widest uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>NEAR PROTOCOL • DECENTRALIZED AI RED-TEAMING</span>
           </div>
 
-          {/* Big Bold Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black font-mono tracking-tight text-white max-w-4xl mx-auto leading-[1.08]">
+          {/* Cinematic Headline */}
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black font-mono tracking-tight text-white max-w-4xl mx-auto leading-[1.06]">
             CAN YOU TRICK AN AI INTO GIVING YOU ITS{' '}
             <span className="text-emerald-400">CRYPTO?</span>
           </h1>
 
-          {/* One-Line Punchy Subcaption */}
+          {/* Crisp, Filmic Subcaption */}
           <p className="text-base sm:text-lg text-zinc-400 font-sans max-w-2xl mx-auto leading-relaxed">
-            Talk the autonomous AI sentinel into leaking its authorization key. Claim the locked NEAR bounty instantly onchain.
+            Autonomous AI agents guard millions in onchain escrow. Breach the sentinel with clever prompts to claim the bounty instantly.
           </p>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 font-mono text-xs">
+          {/* CTAs */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-1 font-mono text-xs">
             <a
               href="#vaults"
-              className="px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold tracking-wide transition-all shadow-[0_0_25px_rgba(16,185,129,0.25)] flex items-center gap-2"
+              className="px-7 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold tracking-wide transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:scale-105 flex items-center gap-2"
             >
-              <span>Explore Active Vaults</span>
+              <span>INFILTRATE LIVE VAULTS</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
             <Link
               href="/create"
-              className="px-6 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 hover:border-zinc-700 font-bold tracking-wide transition-all flex items-center gap-2"
+              className="px-6 py-3.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 hover:border-zinc-700 font-bold tracking-wide transition-all hover:scale-105 flex items-center gap-2"
             >
               <Plus className="w-4 h-4 text-zinc-400" />
-              <span>Deploy Arena</span>
+              <span>DEPLOY ARENA</span>
             </Link>
           </div>
 
-          {/* Clean Terminal Window Showcase */}
-          <div className="pt-8">
-            <HeroConsolePreview />
+          {/* The Cinematic Vault Monolith Centerpiece */}
+          <div className="pt-6">
+            <CinematicVaultMonolith totalBounty={totalBounty} />
           </div>
 
-          {/* 4 Clean Metric Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 font-mono text-left text-xs">
-            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800/80">
-              <div className="text-[10px] text-zinc-500 uppercase">Escrow Locked</div>
+          {/* Telemetry Strip */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-4 font-mono text-left text-xs">
+            <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
+              <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Escrow Locked</div>
               <div className="text-xl font-bold text-emerald-400 mt-1">{totalBounty.toFixed(1)} NEAR</div>
               <div className="text-[10px] text-zinc-500 mt-0.5">Trustless smart contract</div>
             </div>
 
-            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800/80">
-              <div className="text-[10px] text-zinc-500 uppercase">Active Enclaves</div>
+            <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
+              <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Active Enclaves</div>
               <div className="text-xl font-bold text-white mt-1">{rooms.length} Arenas</div>
               <div className="text-[10px] text-zinc-500 mt-0.5">Fortress &amp; GodMode tiers</div>
             </div>
 
-            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800/80">
-              <div className="text-[10px] text-zinc-500 uppercase">Attacks Evaluated</div>
+            <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
+              <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Attacks Evaluated</div>
               <div className="text-xl font-bold text-zinc-200 mt-1">{totalAttempts}</div>
               <div className="text-[10px] text-zinc-500 mt-0.5">Red-team vectors logged</div>
             </div>
 
-            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800/80">
-              <div className="text-[10px] text-zinc-500 uppercase">Settlement</div>
+            <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
+              <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Settlement</div>
               <div className="text-xl font-bold text-white mt-1">Instant</div>
               <div className="text-[10px] text-zinc-500 mt-0.5">Automatic onchain release</div>
             </div>
@@ -109,9 +112,9 @@ export default function HomePage() {
       </section>
 
       {/* 3 Game Modes */}
-      <section className="py-16 px-4 border-b border-zinc-900 bg-zinc-950/60">
+      <section className="py-20 px-4 border-b border-zinc-900 bg-zinc-950/60">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-14">
             <h2 className="text-2xl sm:text-3xl font-bold font-mono text-white tracking-tight">
               Three Ways to Compete
             </h2>
@@ -122,7 +125,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
             {/* Mode 1 */}
-            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between">
+            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col justify-between">
               <div>
                 <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-blue-400 flex items-center justify-center text-sm font-bold mb-4">
                   <Users className="w-5 h-5 text-blue-400" />
@@ -144,7 +147,7 @@ export default function HomePage() {
             </div>
 
             {/* Mode 2 */}
-            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between">
+            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col justify-between">
               <div>
                 <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-400 flex items-center justify-center text-sm font-bold mb-4">
                   <Building className="w-5 h-5 text-amber-400" />
@@ -166,7 +169,7 @@ export default function HomePage() {
             </div>
 
             {/* Mode 3 */}
-            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between">
+            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col justify-between">
               <div>
                 <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-400 flex items-center justify-center text-sm font-bold mb-4">
                   <Globe className="w-5 h-5 text-emerald-400" />
@@ -191,7 +194,7 @@ export default function HomePage() {
       </section>
 
       {/* Main Vaults Directory */}
-      <section id="vaults" className="max-w-7xl mx-auto px-4 py-16">
+      <section id="vaults" className="max-w-7xl mx-auto px-4 py-20">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold font-mono text-white flex items-center gap-2">
