@@ -116,3 +116,4 @@ export const Vault3DCore: React.FC<Vault3DCoreProps> = ({ totalBounty }) => {
     </div>
   );
 };
+
