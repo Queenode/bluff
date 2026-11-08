@@ -51,7 +51,7 @@ export default function HomePage() {
         </div>
 
         {/* Centered Cinematic Headline & CTA */}
-        <div className="relative z-20 max-w-3xl mx-auto px-4 py-16 text-center">
+        <div className="relative z-20 max-w-3xl mx-auto px-4 pt-12 pb-28 text-center">
           <h1 className="text-4xl sm:text-6xl lg:text-[3.85rem] font-extrabold tracking-tight leading-[1.08] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
             Can You Trick an AI
             <span className="block text-emerald-400 mt-1">
@@ -63,7 +63,7 @@ export default function HomePage() {
             Outsmart autonomous AI sentinels with clever prompts. Crack the secret authorization key and claim the NEAR bounty instantly onchain.
           </p>
 
-          <div className="mt-8 flex flex-col items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
             <a
               href="#vaults"
               className="px-6 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-semibold text-sm inline-flex items-center gap-2 transition-all shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_rgba(16,185,129,0.65)] hover:scale-[1.02]"
@@ -74,9 +74,10 @@ export default function HomePage() {
 
             <Link
               href="/create"
-              className="text-xs text-zinc-400 hover:text-emerald-400 transition-colors font-medium"
+              className="px-6 py-3 rounded-lg bg-zinc-950/75 hover:bg-zinc-900/90 border border-white/15 hover:border-emerald-400/50 text-zinc-100 font-semibold text-sm backdrop-blur-md inline-flex items-center gap-2 transition-all hover:scale-[1.02]"
             >
-              or deploy your own squad room / protocol bounty →
+              <span>Deploy Squad / Bounty</span>
+              <ArrowRight className="w-4 h-4 text-emerald-400" />
             </Link>
           </div>
         </div>
