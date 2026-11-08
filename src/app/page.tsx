@@ -31,16 +31,16 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#03060a] text-zinc-100 font-sans selection:bg-emerald-500 selection:text-black">
       {/* FULL-BLEED CINEMATIC HERO SECTION */}
-      <section className="relative min-h-[80vh] flex items-start justify-center overflow-hidden bg-[#03060a]">
+      <section className="relative min-h-[78vh] flex items-center justify-center overflow-hidden bg-[#03060a]">
         {/* Symmetrical AI Sentinels Cinema Backdrop */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src="/images/hero-sentinels.jpg?v=2"
             alt="Autonomous AI Sentinels guarding onchain crypto vault"
-            className="w-full h-full object-cover object-[50%_72%] animate-hero-breath opacity-95"
+            className="w-full h-full object-cover object-center animate-hero-breath opacity-95"
           />
           {/* Subtle vignette for text legibility without covering the bottom coin stack */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(3,6,10,0.42)_0%,rgba(3,6,10,0.16)_48%,rgba(3,6,10,0.72)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(3,6,10,0.42)_0%,rgba(3,6,10,0.16)_48%,rgba(3,6,10,0.72)_100%)]" />
           <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#03060a]/75 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#03060a]/80 to-transparent" />
         </div>
@@ -51,7 +51,7 @@ export default function HomePage() {
         </div>
 
         {/* Centered Cinematic Headline & CTA */}
-        <div className="relative z-20 max-w-3xl mx-auto px-4 pt-16 sm:pt-20 pb-48 text-center">
+        <div className="relative z-20 max-w-3xl mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl sm:text-6xl lg:text-[3.85rem] font-extrabold tracking-tight leading-[1.08] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
             Can You Trick an AI
             <span className="block text-emerald-400 mt-1">
