@@ -62,19 +62,14 @@ export default function HomePage() {
         </div>
 
         {/* Centered Cinematic Gaming Headline & CTAs */}
-        <div className="relative z-20 max-w-4xl mx-auto px-4 pt-10 pb-36 text-center">
-          {/* Gaming HUD Overline Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 mb-5 clip-game-btn bg-emerald-950/75 border border-emerald-400/40 backdrop-blur-md text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.25)]">
-            <Flame className="w-3.5 h-3.5 text-emerald-400" />
-            <span>[ SEASON 01 // PVP AI BOSS ARENA ]</span>
-          </div>
-
+        <div className="relative z-20 max-w-4xl mx-auto px-4 pt-12 pb-36 text-center">
           <h1 className="font-display text-3xl sm:text-5xl lg:text-[3.35rem] font-black uppercase tracking-wider leading-[1.14]">
             <span className="block text-white text-glow-white">
               Can You Trick an AI
             </span>
-            <span className="block mt-2 text-emerald-400 text-glow-emerald">
-              Into Giving You Its Crypto?
+            <span className="block mt-2 text-white text-glow-white">
+              Into Giving You Its{' '}
+              <span className="text-emerald-400 text-glow-emerald">Crypto?</span>
             </span>
           </h1>
 
