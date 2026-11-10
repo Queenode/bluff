@@ -17,7 +17,7 @@ import {
 export default function ArenasDirectoryPage() {
   const { rooms, activeFilter, setActiveFilter } = useNear();
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'breached'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'breached' | 'expired'>('all');
 
   const filteredRooms = rooms.filter(room => {
     const matchesCategory = activeFilter === 'all' || room.category === activeFilter;
@@ -173,6 +173,14 @@ export default function ArenasDirectoryPage() {
                 }`}
               >
                 Slain
+              </button>
+              <button
+                onClick={() => setStatusFilter('expired')}
+                className={`px-2.5 py-1 rounded transition-colors ${
+                  statusFilter === 'expired' ? 'bg-zinc-800 text-amber-400 font-bold' : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                Expired
               </button>
             </div>
           </div>

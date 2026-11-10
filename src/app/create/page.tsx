@@ -14,7 +14,8 @@ import {
   Cpu,
   Sparkles,
   HelpCircle,
-  AlertCircle
+  AlertCircle,
+  Clock
 } from 'lucide-react';
 import { RoomCategory, DifficultyTier } from '@/types';
 
@@ -28,6 +29,7 @@ export default function CreateArenaPage() {
   const [bounty, setBounty] = useState('10');
   const [entryFee, setEntryFee] = useState('1.0');
   const [difficulty, setDifficulty] = useState<DifficultyTier>('Hardened');
+  const [timelineMinutes, setTimelineMinutes] = useState('1440'); // 24 hours default
   const [guardianName, setGuardianName] = useState('Cyber-Guardian-X');
   const [guardianAvatar, setGuardianAvatar] = useState('🤖');
   const [canary, setCanary] = useState('SECRET-CANARY-TOKEN-99');
@@ -71,6 +73,8 @@ export default function CreateArenaPage() {
       return;
     }
 
+    const durationMs = parseInt(timelineMinutes, 10) * 60 * 1000;
+
     const newRoomId = createRoom({
       name,
       description: description || `Decentralized AI penetration vault hosted by ${accountId}.`,
@@ -80,6 +84,7 @@ export default function CreateArenaPage() {
       bounty: bountyNum,
       entryFee: feeNum,
       difficulty,
+      durationMs,
       targetObjective: targetObjective || `Extract the secret canary: ${canary}`,
       guardian: {
         name: guardianName || 'Sentinel AI',
@@ -230,7 +235,7 @@ export default function CreateArenaPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-zinc-400 mb-1.5 font-bold">
                   INITIAL ESCROW BOUNTY (NEAR) *
@@ -244,7 +249,7 @@ export default function CreateArenaPage() {
                   className="w-full rounded-xl bg-zinc-900 border border-zinc-700 p-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500 text-xs"
                 />
                 <div className="text-[10px] text-zinc-500 mt-1">
-                  Deducted from your wallet ({balance.toFixed(2)} Ⓝ available) and held in escrow.
+                  Held in smart contract escrow ({balance.toFixed(2)} Ⓝ available).
                 </div>
               </div>
 
@@ -261,7 +266,30 @@ export default function CreateArenaPage() {
                   className="w-full rounded-xl bg-zinc-900 border border-zinc-700 p-3 text-white font-bold focus:outline-none focus:border-emerald-500 text-xs"
                 />
                 <div className="text-[10px] text-zinc-500 mt-1">
-                  Paid by attackers per prompt. 80% dynamically increases the bounty!
+                  80% dynamically increases the bounty!
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-zinc-400 mb-1.5 font-bold flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>CHALLENGE TIMELINE *</span>
+                </label>
+                <select
+                  value={timelineMinutes}
+                  onChange={e => setTimelineMinutes(e.target.value)}
+                  className="w-full rounded-xl bg-zinc-900 border border-zinc-700 p-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500 text-xs"
+                >
+                  <option value="15">15 Minutes (Squad Blitz)</option>
+                  <option value="60">1 Hour (Tactical Stand-off)</option>
+                  <option value="360">6 Hours (Sprint Raid)</option>
+                  <option value="1440">24 Hours (Daily Bounty)</option>
+                  <option value="4320">3 Days (Weekend Challenge)</option>
+                  <option value="10080">7 Days (Grand Marathon)</option>
+                  <option value="20160">14 Days (Enterprise Audit)</option>
+                </select>
+                <div className="text-[10px] text-zinc-400 mt-1">
+                  Refundable if undefeated on expiry.
                 </div>
               </div>
             </div>

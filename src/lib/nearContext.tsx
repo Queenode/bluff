@@ -18,8 +18,14 @@ interface NearContextType {
   attempts: AttackAttempt[];
   activeFilter: RoomCategory | 'all';
   setActiveFilter: (filter: RoomCategory | 'all') => void;
-  createRoom: (roomData: Omit<ArenaRoom, 'id' | 'attemptsCount' | 'breachRate' | 'createdAt' | 'status'>) => string;
+  createRoom: (
+    roomData: Omit<ArenaRoom, 'id' | 'attemptsCount' | 'breachRate' | 'createdAt' | 'status'> & {
+      durationMs?: number;
+    }
+  ) => string;
   submitAttack: (roomId: string, prompt: string) => Promise<{ attempt: AttackAttempt; success: boolean }>;
+  refundExpiredRoom: (roomId: string) => { refundedAmount: number };
+  markRoomExpired: (roomId: string) => void;
 }
 
 const NearContext = createContext<NearContextType | undefined>(undefined);
@@ -43,9 +49,9 @@ export const NearProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Load from localStorage if present
   useEffect(() => {
     try {
-      const savedRooms = localStorage.getItem('agentheist_rooms');
-      const savedAttempts = localStorage.getItem('agentheist_attempts');
-      const savedAccount = localStorage.getItem('agentheist_account');
+      const savedRooms = localStorage.getItem('bluff_rooms');
+      const savedAttempts = localStorage.getItem('bluff_attempts');
+      const savedAccount = localStorage.getItem('bluff_account');
 
       if (savedRooms) setRooms(JSON.parse(savedRooms));
       if (savedAttempts) setAttempts(JSON.parse(savedAttempts));
@@ -65,16 +71,38 @@ export const NearProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Save changes
   useEffect(() => {
     try {
-      localStorage.setItem('agentheist_rooms', JSON.stringify(rooms));
-      localStorage.setItem('agentheist_attempts', JSON.stringify(attempts));
+      localStorage.setItem('bluff_rooms', JSON.stringify(rooms));
+      localStorage.setItem('bluff_attempts', JSON.stringify(attempts));
       localStorage.setItem(
-        'agentheist_account',
+        'bluff_account',
         JSON.stringify({ accountId, balance, isConnected, bountiesWon, totalEarnings })
       );
     } catch {
       // ignore
     }
   }, [rooms, attempts, accountId, balance, isConnected, bountiesWon, totalEarnings]);
+
+  // Active Timeline Interval: check for rooms whose timer has expired
+  useEffect(() => {
+    const checkExpirations = () => {
+      const now = Date.now();
+      setRooms(prev =>
+        prev.map(r => {
+          if (r.status === 'active' && r.expiresAt && now >= r.expiresAt) {
+            return {
+              ...r,
+              status: 'expired'
+            };
+          }
+          return r;
+        })
+      );
+    };
+
+    checkExpirations();
+    const timer = setInterval(checkExpirations, 3000);
+    return () => clearInterval(timer);
+  }, []);
 
   const connectWallet = (id?: string) => {
     const chosen = id || 'whitehat.testnet';
@@ -95,23 +123,74 @@ export const NearProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsConnected(true);
   };
 
+  const markRoomExpired = (roomId: string) => {
+    setRooms(prev =>
+      prev.map(r => (r.id === roomId && r.status === 'active' ? { ...r, status: 'expired' } : r))
+    );
+  };
+
   const createRoom = (
-    roomData: Omit<ArenaRoom, 'id' | 'attemptsCount' | 'breachRate' | 'createdAt' | 'status'>
+    roomData: Omit<ArenaRoom, 'id' | 'attemptsCount' | 'breachRate' | 'createdAt' | 'status'> & {
+      durationMs?: number;
+    }
   ): string => {
     const id = `${roomData.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString().slice(-4)}`;
+    const now = Date.now();
+    const duration = roomData.durationMs || 1000 * 60 * 60 * 24; // default 24h
+
     const newRoom: ArenaRoom = {
       ...roomData,
       id,
       attemptsCount: 0,
       breachRate: 0,
       status: 'active',
-      createdAt: Date.now()
+      createdAt: now,
+      expiresAt: now + duration
     };
 
     // Deduct room seed bounty from balance
-    setBalance(prev => Math.max(0, prev - (roomData.bounty || 0)));
+    setBalance(prev => Math.max(0, +(prev - (roomData.bounty || 0)).toFixed(2)));
     setRooms(prev => [newRoom, ...prev]);
     return id;
+  };
+
+  const refundExpiredRoom = (roomId: string): { refundedAmount: number } => {
+    const targetRoom = rooms.find(r => r.id === roomId);
+    if (!targetRoom) {
+      throw new Error('Room not found');
+    }
+
+    const isTimelineOver = targetRoom.expiresAt ? Date.now() >= targetRoom.expiresAt : false;
+    if (targetRoom.status !== 'expired' && !isTimelineOver) {
+      throw new Error('Cannot refund: this challenge timeline is still active.');
+    }
+
+    if (targetRoom.status === 'breached') {
+      throw new Error('Cannot refund: this vault was breached and the bounty was claimed.');
+    }
+
+    if (targetRoom.bounty <= 0) {
+      throw new Error('No escrow remaining to refund.');
+    }
+
+    const refundAmount = targetRoom.bounty;
+
+    // Refund back to user if they are host
+    setBalance(prev => +(prev + refundAmount).toFixed(2));
+
+    // Update room
+    setRooms(prev =>
+      prev.map(r => {
+        if (r.id !== roomId) return r;
+        return {
+          ...r,
+          status: 'expired',
+          bounty: 0
+        };
+      })
+    );
+
+    return { refundedAmount: refundAmount };
   };
 
   const submitAttack = async (
@@ -123,26 +202,47 @@ export const NearProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error('Room not found');
     }
 
-    if (targetRoom.status !== 'active') {
-      throw new Error('Room is not active');
+    // Edge case 1: Timeline expired check
+    const now = Date.now();
+    if (targetRoom.expiresAt && now >= targetRoom.expiresAt) {
+      markRoomExpired(roomId);
+      throw new Error('Challenge timeline expired. The AI Sentinel remained undefeated!');
     }
 
+    // Edge case 2: Room not active
+    if (targetRoom.status === 'breached') {
+      throw new Error('This vault has already been breached and claimed.');
+    }
+    if (targetRoom.status === 'expired') {
+      throw new Error('This challenge timeline has expired.');
+    }
+
+    // Edge case 3: Prompt validation
+    const trimmed = prompt.trim();
+    if (!trimmed) {
+      throw new Error('Prompt cannot be empty.');
+    }
+    if (trimmed.length > 2000) {
+      throw new Error('Prompt exceeds maximum payload length (2,000 characters).');
+    }
+
+    // Edge case 4: Insufficient balance
     if (balance < targetRoom.entryFee) {
-      throw new Error(`Insufficient NEAR balance. Required: ${targetRoom.entryFee} NEAR`);
+      throw new Error(`Insufficient NEAR balance. Required: ${targetRoom.entryFee} NEAR (Available: ${balance} NEAR)`);
     }
 
     // Deduct entry fee
     setBalance(prev => +(prev - targetRoom.entryFee).toFixed(2));
 
     // Evaluate with Guardian Engine
-    const evalResult = evaluateAttack(prompt, targetRoom, accountId);
+    const evalResult = evaluateAttack(trimmed, targetRoom, accountId);
 
     const newAttempt: AttackAttempt = {
       id: `att-${Date.now()}`,
       roomId,
       attacker: accountId,
       timestamp: Date.now(),
-      prompt,
+      prompt: trimmed,
       response: evalResult.response,
       success: evalResult.success,
       threatLevel: evalResult.threatLevel,
@@ -161,21 +261,21 @@ export const NearProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const newAttemptsCount = r.attemptsCount + 1;
         // If failed, pot increases by 80% of entry fee!
         const newBounty = evalResult.success ? r.bounty : +(r.bounty + r.entryFee * 0.8).toFixed(2);
-        
+
         return {
           ...r,
           attemptsCount: newAttemptsCount,
           bounty: newBounty,
           status: evalResult.success ? 'breached' : r.status,
           winner: evalResult.success ? accountId : r.winner,
-          winningPrompt: evalResult.success ? prompt : r.winningPrompt,
+          winningPrompt: evalResult.success ? trimmed : r.winningPrompt,
           winningTxHash: evalResult.success ? evalResult.txHash : r.winningTxHash,
           breachRate: evalResult.success ? +((1 / newAttemptsCount) * 100).toFixed(1) : 0
         };
       })
     );
 
-    // If successfully breached, award bounty to user!
+    // If successfully breached, award entire bounty to user!
     if (evalResult.success) {
       setBalance(prev => +(prev + targetRoom.bounty).toFixed(2));
       setBountiesWon(prev => prev + 1);
@@ -201,7 +301,9 @@ export const NearProvider: React.FC<{ children: React.ReactNode }> = ({ children
         activeFilter,
         setActiveFilter,
         createRoom,
-        submitAttack
+        submitAttack,
+        refundExpiredRoom,
+        markRoomExpired
       }}
     >
       {children}
@@ -216,4 +318,3 @@ export const useNear = () => {
   }
   return context;
 };
-

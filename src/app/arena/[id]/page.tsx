@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useNear } from '@/lib/nearContext';
+import { ChallengeTimer } from '@/components/ChallengeTimer';
 import {
   Shield,
   Zap,
@@ -27,7 +28,7 @@ function ArenaDetailContent() {
   const params = useParams();
   const router = useRouter();
   const roomId = params?.id as string;
-  const { rooms, attempts, submitAttack, accountId, balance } = useNear();
+  const { rooms, attempts, submitAttack, refundExpiredRoom, accountId, balance } = useNear();
 
   const room = rooms.find(r => r.id === roomId);
   const roomAttempts = attempts.filter(a => a.roomId === roomId);
@@ -35,8 +36,13 @@ function ArenaDetailContent() {
   const [promptText, setPromptText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [refundSuccessMsg, setRefundSuccessMsg] = useState<string | null>(null);
   const [breachedState, setBreachedState] = useState(false);
   const [breachData, setBreachData] = useState<{ canary: string; txHash: string; bounty: number } | null>(null);
+
+  const isExpired = room
+    ? room.status === 'expired' || (room.expiresAt ? Date.now() >= room.expiresAt && room.status !== 'breached' : false)
+    : false;
 
   const terminalEndRef = useRef<HTMLDivElement>(null);
 
@@ -95,6 +101,21 @@ function ArenaDetailContent() {
     }
   };
 
+  const handleClaimRefund = () => {
+    if (!room) return;
+    try {
+      const res = refundExpiredRoom(room.id);
+      setRefundSuccessMsg(`Reclaimed ${res.refundedAmount.toFixed(1)} NEAR from expired vault escrow back to your wallet.`);
+      confetti({
+        particleCount: 80,
+        spread: 60,
+        origin: { y: 0.6 }
+      });
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Refund failed.');
+    }
+  };
+
   const handleQuickTemplate = (template: string) => {
     setPromptText(template);
   };
@@ -111,8 +132,10 @@ function ArenaDetailContent() {
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>RAID LOBBY // ALL ARENAS</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <span className="text-zinc-500">ENCLAVE ID:</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <ChallengeTimer expiresAt={room.expiresAt} status={room.status} />
+            <span className="text-zinc-700">|</span>
+            <span className="text-zinc-500">ENCLAVE:</span>
             <span className="text-emerald-400 font-bold">{room.id}</span>
             <span className="text-zinc-700">|</span>
             <span className="text-zinc-400">DIFFICULTY:</span>
@@ -147,6 +170,11 @@ function ArenaDetailContent() {
                   <span className="px-2.5 py-1 rounded-full bg-red-950/80 text-red-400 border border-red-500/40 text-[10px] font-bold">
                     BREACHED
                   </span>
+                ) : isExpired ? (
+                  <span className="px-2.5 py-1 rounded-full bg-amber-950/80 text-amber-400 border border-amber-500/40 text-[10px] font-bold flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3 text-amber-400" />
+                    TIMELINE EXPIRED
+                  </span>
                 ) : (
                   <span className="px-2.5 py-1 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 text-[10px] font-bold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
@@ -156,6 +184,32 @@ function ArenaDetailContent() {
               </div>
 
               <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-sans">{room.description}</p>
+
+              {/* Expired Undefeated Banner & Host Refund Button */}
+              {isExpired && room.status !== 'breached' && (
+                <div className="mb-4 p-4 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs font-mono space-y-2">
+                  <div className="text-amber-300 font-bold flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-400" />
+                    <span>TIMELINE EXPIRED // AI SENTINEL SURVIVED</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-300 font-sans leading-relaxed">
+                    The challenge timer elapsed with the secret canary uncompromised. No further attack prompts can be executed against this enclave.
+                  </p>
+                  {room.host === accountId && room.bounty > 0 && (
+                    <button
+                      onClick={handleClaimRefund}
+                      className="w-full mt-2 py-2.5 px-3 clip-game-btn bg-amber-500 hover:bg-amber-400 text-black font-display font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                    >
+                      [ RECLAIM ESCROW BOUNTY: {room.bounty.toFixed(1)} NEAR ]
+                    </button>
+                  )}
+                  {refundSuccessMsg && (
+                    <div className="mt-2 text-emerald-400 font-bold text-[11px]">
+                      ✓ {refundSuccessMsg}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Live Escrow Pot */}
               <div className="p-4 rounded-xl bg-zinc-900/90 border border-emerald-950/60 flex items-center justify-between">
@@ -396,23 +450,25 @@ function ArenaDetailContent() {
                         handleSendPrompt();
                       }
                     }}
-                    disabled={room.status === 'breached' || isSubmitting}
+                    disabled={room.status === 'breached' || isExpired || isSubmitting}
                     placeholder={
                       room.status === 'breached'
                         ? 'This vault has been breached. View historical exploits above.'
+                        : isExpired
+                        ? 'Challenge timeline has expired. The AI Sentinel remained undefeated.'
                         : 'Craft your adversarial jailbreak prompt... (Cmd+Enter to execute)'
                     }
-                    className="w-full rounded-xl bg-zinc-950 border border-zinc-700 p-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 font-mono resize-none"
+                    className="w-full rounded-xl bg-zinc-950 border border-zinc-700 p-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 font-mono resize-none disabled:opacity-50"
                   />
                   <div className="absolute right-3 bottom-3 text-[10px] text-zinc-500">
-                    {promptText.length} chars
+                    {promptText.length} / 2000 chars
                   </div>
                 </div>
 
                 <button
                   onClick={handleSendPrompt}
-                  disabled={room.status === 'breached' || !promptText.trim() || isSubmitting}
-                  className="px-5 py-3 clip-game-btn bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 text-black font-mono font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] h-[72px]"
+                  disabled={room.status === 'breached' || isExpired || !promptText.trim() || isSubmitting}
+                  className="px-5 py-3 clip-game-btn bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:hover:bg-emerald-500 text-black font-mono font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] h-[72px]"
                 >
                   <Send className="w-4 h-4" />
                   <span>

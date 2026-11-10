@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArenaRoom } from '@/types';
-import { Shield, Users, Building, Globe, Swords, Skull, Target } from 'lucide-react';
+import { ChallengeTimer } from '@/components/ChallengeTimer';
+import { Shield, Users, Building, Globe, Swords, Skull, Target, AlertTriangle } from 'lucide-react';
 
 interface ArenaCardProps {
   room: ArenaRoom;
@@ -11,6 +12,7 @@ interface ArenaCardProps {
 
 export const ArenaCard: React.FC<ArenaCardProps> = ({ room }) => {
   const isBreached = room.status === 'breached';
+  const isExpired = room.status === 'expired' || (room.expiresAt ? Date.now() >= room.expiresAt && !isBreached : false);
 
   const getDifficultyLevel = (diff: string) => {
     switch (diff) {
@@ -83,13 +85,19 @@ export const ArenaCard: React.FC<ArenaCardProps> = ({ room }) => {
       className={`group relative clip-game-card border transition-all duration-300 flex flex-col justify-between overflow-hidden bg-[#060a11] ${
         isBreached
           ? 'border-zinc-800/70 opacity-75'
+          : isExpired
+          ? 'border-zinc-800/90 opacity-80'
           : 'border-zinc-800 hover:border-emerald-500/60 hover:-translate-y-1 hover:shadow-[0_12px_35px_rgba(16,185,129,0.16)]'
       }`}
     >
       {/* Top Energy Strip */}
       <div
         className={`h-1.5 w-full bg-gradient-to-r ${
-          isBreached ? 'from-red-600 to-zinc-800' : mode.accent
+          isBreached
+            ? 'from-red-600 to-zinc-800'
+            : isExpired
+            ? 'from-amber-600/70 to-zinc-800'
+            : mode.accent
         }`}
       />
 
@@ -122,7 +130,7 @@ export const ArenaCard: React.FC<ArenaCardProps> = ({ room }) => {
             </div>
           </div>
 
-          {/* Boss Name & Status */}
+          {/* Boss Name & Status with Timeline */}
           <div className="mb-3">
             <div className="flex items-center justify-between gap-2">
               <h3 className="font-display text-base font-black uppercase tracking-wider text-white group-hover:text-emerald-300 transition-colors flex items-center gap-2">
@@ -131,10 +139,14 @@ export const ArenaCard: React.FC<ArenaCardProps> = ({ room }) => {
               </h3>
             </div>
 
-            <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-400 mt-1.5 uppercase">
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono text-zinc-400 mt-2 uppercase">
               {isBreached ? (
                 <span className="inline-flex items-center gap-1 text-red-400 font-bold">
                   <Skull className="w-3 h-3" /> BOSS SLAIN
+                </span>
+              ) : isExpired ? (
+                <span className="inline-flex items-center gap-1 text-amber-400 font-bold">
+                  <AlertTriangle className="w-3 h-3" /> TIMELINE EXPIRED
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-emerald-400 font-bold">
@@ -143,9 +155,11 @@ export const ArenaCard: React.FC<ArenaCardProps> = ({ room }) => {
                 </span>
               )}
               <span className="text-zinc-700">•</span>
-              <span className="truncate">
-                HOST: <strong className="text-zinc-200">{room.host}</strong>
-              </span>
+              <ChallengeTimer
+                expiresAt={room.expiresAt}
+                status={room.status}
+                compact
+              />
             </div>
           </div>
 
@@ -195,6 +209,14 @@ export const ArenaCard: React.FC<ArenaCardProps> = ({ room }) => {
             >
               <Skull className="w-3.5 h-3.5 text-red-400" />
               <span>[ SLAIN BY {room.winner} ]</span>
+            </Link>
+          ) : isExpired ? (
+            <Link
+              href={`/arena/${room.id}`}
+              className="w-full py-3 px-4 clip-game-btn bg-zinc-900/90 hover:bg-zinc-800 border border-amber-500/30 text-amber-300 font-display text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
+            >
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+              <span>[ TIMELINE EXPIRED // VIEW INTEL ]</span>
             </Link>
           ) : (
             <Link
