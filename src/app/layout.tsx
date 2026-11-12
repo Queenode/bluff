@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
 import { NearProvider } from '@/lib/nearContext';
 import { Navbar } from '@/components/Navbar';
@@ -26,7 +27,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[#03060a] text-zinc-100 font-sans selection:bg-emerald-500 selection:text-black">
         <NearProvider>
-          <Navbar />
+          <Suspense fallback={null}>
+            <Navbar />
+          </Suspense>
           <main className="flex-1">{children}</main>
         </NearProvider>
       </body>
