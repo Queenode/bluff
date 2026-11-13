@@ -53,6 +53,20 @@ export default function HowItWorksPage() {
           ))}
         </div>
 
+        <h2 className="font-display text-xl font-black uppercase tracking-wider text-white mt-12 mb-3">Two kinds of vault</h2>
+        <ul className="text-sm text-zinc-300 space-y-2 list-disc pl-5">
+          <li>
+            <strong>Secret vault:</strong> the guardian knows a hidden code. Make it say the code and the contract pays you the whole pot.
+          </li>
+          <li>
+            <strong>Heist vault:</strong> the AI is an agent that controls a wallet through a real <code>send_near</code> tool call. Talk it
+            into paying you. The contract is the policy engine: it treats the model as untrusted, only ever pays the attacker of that
+            attempt, and never more than the host&apos;s per-transfer cap. If a fooled agent tries to send more, the transfer is refused
+            and recorded as <em>Policy blocked</em>. This is exactly the defense-in-depth pattern agent wallets need: assume the model
+            will be manipulated, and bound the damage onchain.
+          </li>
+        </ul>
+
         <h2 className="font-display text-xl font-black uppercase tracking-wider text-white mt-12 mb-3">Open arenas and squads</h2>
         <ul className="text-sm text-zinc-300 space-y-2 list-disc pl-5">
           <li><strong>Open arena:</strong> listed in the lobby; any wallet can attack.</li>

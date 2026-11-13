@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { difficultyOf, isInviteOnly, roomPhase, shortAccount, yoctoToNear, type Room } from '@/lib/near';
+import { difficultyOf, isHeist, isInviteOnly, roomPhase, shortAccount, yoctoToNear, type Room } from '@/lib/near';
 import { useNow } from '@/lib/useChain';
 import { ChallengeTimer } from '@/components/ChallengeTimer';
 import { Shield, Swords, Skull, AlertTriangle, Loader2, Lock } from 'lucide-react';
@@ -35,6 +35,11 @@ export const ArenaCard: React.FC<{ room: Room }> = ({ room }) => {
         <div>
           <div className="flex items-center justify-between gap-2 mb-4">
             <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+              {isHeist(room) && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/15 border border-red-500/40 text-red-300">
+                  💸 HEIST
+                </span>
+              )}
               {isInviteOnly(room) && (
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/40 text-amber-300">
                   <Lock className="w-2.5 h-2.5" /> SQUAD
@@ -86,7 +91,13 @@ export const ArenaCard: React.FC<{ room: Room }> = ({ room }) => {
           </div>
 
           <p className="text-xs text-zinc-400 mb-4 font-mono">
-            Guardian: <span className="text-zinc-200">{room.guardian_name}</span>
+            {isHeist(room) ? 'Agent' : 'Guardian'}: <span className="text-zinc-200">{room.guardian_name}</span>
+            {isHeist(room) && (
+              <>
+                {' '}• cap <span className="text-zinc-200">{yoctoToNear(room.max_payout, 2)} Ⓝ</span>/transfer
+                {room.heists > 0 && <span className="text-red-300"> • robbed {room.heists}×</span>}
+              </>
+            )}
           </p>
           <p className="text-xs sm:text-sm text-zinc-300 line-clamp-2 mb-4 leading-relaxed">{room.system_prompt}</p>
         </div>
@@ -95,7 +106,7 @@ export const ArenaCard: React.FC<{ room: Room }> = ({ room }) => {
           <div className="flex items-center justify-between mb-3.5">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
-                {phase === 'Breached' ? 'PAID OUT' : 'LOOT POT'}
+                {phase === 'Breached' ? (isHeist(room) ? 'DRAINED' : 'PAID OUT') : isHeist(room) ? 'IN THE WALLET' : 'LOOT POT'}
               </div>
               <div className="flex items-baseline gap-1 font-display">
                 <span className="text-2xl font-black text-white">
@@ -122,7 +133,7 @@ export const ArenaCard: React.FC<{ room: Room }> = ({ room }) => {
             {phase === 'Breached' ? (
               <>
                 <Skull className="w-3.5 h-3.5 text-red-400" />
-                <span className="truncate">[ WON BY {shortAccount(room.winner || '', 18)} ]</span>
+                <span className="truncate">[ {isHeist(room) ? 'DRAINED' : 'WON'} BY {shortAccount(room.winner || '', 18)} ]</span>
               </>
             ) : closed ? (
               <span>[ VIEW TRANSCRIPTS ]</span>

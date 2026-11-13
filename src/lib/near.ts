@@ -1,7 +1,7 @@
 // Shared (browser + server) helpers for reading the BLUFF contract over JSON-RPC.
 
 export const NETWORK_ID = (process.env.NEXT_PUBLIC_NETWORK_ID || 'testnet') as 'testnet' | 'mainnet';
-export const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID || 'bluff-vault-76371.testnet';
+export const CONTRACT_ID = process.env.NEXT_PUBLIC_BLUFF_CONTRACT || 'bluff-live-76371.testnet';
 export const RPC_URL =
   process.env.NEXT_PUBLIC_RPC_URL ||
   (NETWORK_ID === 'mainnet' ? 'https://free.rpc.fastnear.com' : 'https://test.rpc.fastnear.com');
@@ -12,7 +12,7 @@ export const txUrl = (hash: string) => `${EXPLORER_URL}/txns/${hash}`;
 export const accountUrl = (id: string) => `${EXPLORER_URL}/address/${id}`;
 
 export type RoomStatus = 'Pending' | 'Active' | 'Breached' | 'Refunded';
-export type AttemptStatus = 'Pending' | 'Defended' | 'Breached' | 'Refunded';
+export type AttemptStatus = 'Pending' | 'Defended' | 'Breached' | 'Refunded' | 'Heisted' | 'PolicyBlocked';
 
 /** Room as returned by the contract (u64 / NearToken values are strings). */
 export interface Room {
@@ -36,6 +36,10 @@ export interface Room {
   revealed_canary: string | null;
   payout: string | null;
   invited: string[];
+  mode: number; // 0 = secret, 1 = heist
+  max_payout: string;
+  heists: number;
+  total_heisted: string;
 }
 
 export interface Attempt {
@@ -50,6 +54,7 @@ export interface Attempt {
   response: string | null;
   attack_vector: string | null;
   proof: string | null;
+  transfer: string | null;
   judged_at: string | null;
 }
 
@@ -213,3 +218,5 @@ export function parseAccountList(text: string): { valid: string[]; invalid: stri
   }
   return { valid, invalid };
 }
+
+export const isHeist = (room: Room) => room.mode === 1;

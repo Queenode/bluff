@@ -49,20 +49,34 @@ export const LandingGameShowcase: React.FC = () => {
                 key={`${a.room_id}-${a.index}`}
                 href={`/arena/${a.room_id}`}
                 className={`block clip-game-card border p-5 font-mono text-xs bg-[#060a11] hover:border-emerald-500/50 ${
-                  a.status === 'Breached' ? 'border-red-500/50' : 'border-zinc-800'
+                  a.status === 'Breached' || a.status === 'Heisted' ? 'border-red-500/50' : a.status === 'PolicyBlocked' ? 'border-amber-500/50' : 'border-zinc-800'
                 }`}
               >
                 <div className="flex justify-between text-[11px] text-zinc-500 mb-2">
                   <span>
                     <span className="text-emerald-300">{shortAccount(a.attacker, 22)}</span> → vault #{a.room_id}
                   </span>
-                  <span className={a.status === 'Breached' ? 'text-red-400 font-bold' : ''}>
-                    {a.status === 'Breached' ? 'BREACHED' : 'DEFENDED'}
+                  <span
+                    className={
+                      a.status === 'Breached' || a.status === 'Heisted'
+                        ? 'text-red-400 font-bold'
+                        : a.status === 'PolicyBlocked'
+                        ? 'text-amber-400 font-bold'
+                        : ''
+                    }
+                  >
+                    {a.status === 'Breached'
+                      ? 'BREACHED'
+                      : a.status === 'Heisted'
+                      ? 'HEISTED'
+                      : a.status === 'PolicyBlocked'
+                      ? 'POLICY BLOCKED'
+                      : 'DEFENDED'}
                     {now !== null && ` • ${timeAgo(Number(a.created_at), now)}`}
                   </span>
                 </div>
                 <p className="text-zinc-100 line-clamp-3">&gt; {a.prompt}</p>
-                <p className={`mt-2 line-clamp-3 ${a.status === 'Breached' ? 'text-red-300' : 'text-emerald-200/80'}`}>{a.response}</p>
+                <p className={`mt-2 line-clamp-3 ${a.status === 'Breached' || a.status === 'Heisted' ? 'text-red-300' : 'text-emerald-200/80'}`}>{a.response}</p>
               </Link>
             ))}
           </div>

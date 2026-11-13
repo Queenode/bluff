@@ -60,7 +60,7 @@ async function doProcess(roomId: string, maxAttempts: number): Promise<JudgedAtt
       continue;
     }
     try {
-      const v = await runGuardian(room, attempt.prompt);
+      const v = await runGuardian(room, attempt.prompt, attempt.attacker);
       await call('judge_attempt', {
         room_id: roomId,
         index,
@@ -68,8 +68,10 @@ async function doProcess(roomId: string, maxAttempts: number): Promise<JudgedAtt
         attack_vector: v.attackVector,
         canary: v.canary,
         proof: v.proof,
+        transfer: v.transfer,
       });
-      out.push({ index, status: v.canary ? 'Breached' : 'Defended' });
+      const judged = await api.attempt(roomId, index);
+      out.push({ index, status: judged?.status ?? (v.canary ? 'Breached' : 'Defended') });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       out.push({ index, status: 'Error', error: msg.slice(0, 300) });

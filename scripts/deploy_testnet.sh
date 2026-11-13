@@ -25,6 +25,6 @@ near contract deploy "$CONTRACT" use-file contracts/bluff_escrow.wasm \
 
 echo
 echo "Deployed. Put these in .env.local:"
-echo "NEXT_PUBLIC_CONTRACT_ID=$CONTRACT"
+echo "NEXT_PUBLIC_BLUFF_CONTRACT=$CONTRACT"
 echo "ORACLE_ACCOUNT_ID=$ORACLE"
 echo "ORACLE_PRIVATE_KEY=$(python3 -c "import json,os;print(json.load(open(os.path.expanduser('~/.near-credentials/testnet/$ORACLE.json')))['private_key'])")"

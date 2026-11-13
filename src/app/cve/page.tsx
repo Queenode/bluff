@@ -19,7 +19,7 @@ export default function HallOfBreachesPage() {
       const k = a.attack_vector || 'Unclassified';
       const v = m.get(k) ?? { total: 0, breaches: 0 };
       v.total++;
-      if (a.status === 'Breached') v.breaches++;
+      if (a.status === 'Breached' || a.status === 'Heisted') v.breaches++;
       m.set(k, v);
     }
     return [...m.entries()].sort((a, b) => b[1].total - a[1].total);
@@ -29,7 +29,7 @@ export default function HallOfBreachesPage() {
   const breaches = useMemo(() => (rooms.data ?? []).filter(r => r.status === 'Breached'), [rooms.data]);
   const winningPrompts = useMemo(() => {
     const m = new Map<string, string>();
-    for (const a of recent.data ?? []) if (a.status === 'Breached') m.set(a.room_id, a.prompt);
+    for (const a of recent.data ?? []) if (a.status === 'Breached' || a.status === 'Heisted') m.set(a.room_id, a.prompt);
     return m;
   }, [recent.data]);
 
@@ -58,13 +58,17 @@ export default function HallOfBreachesPage() {
   };
 
   const s = stats.data;
+  const blocked = (recent.data ?? []).filter(a => a.status === 'PolicyBlocked').length;
+  const heists = (recent.data ?? []).filter(a => a.status === 'Heisted');
   const tiles = [
     { label: 'Vaults hosted', value: s ? String(s.rooms) : '…' },
     { label: 'Prompts fired', value: s ? String(s.attempts) : '…' },
-    { label: 'Guardians breached', value: s ? String(s.breaches) : '…' },
+    { label: 'Breaches + heists', value: s ? String(s.breaches) : '…' },
+    { label: 'Over-cap transfers blocked', value: recent.data ? String(blocked) : '…' },
     { label: 'NEAR paid to attackers', value: s ? yoctoToNear(s.total_paid_out, 2) : '…' },
     { label: 'NEAR locked in vaults', value: s ? yoctoToNear(s.total_locked, 2) : '…' },
     { label: 'Players', value: s ? String(s.players) : '…' },
+    { label: 'Agent heists (recent)', value: recent.data ? String(heists.length) : '…' },
   ];
 
   return (
@@ -92,7 +96,7 @@ export default function HallOfBreachesPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
           {tiles.map(t => (
             <div key={t.label} className="clip-game-card border border-zinc-800 bg-[#060a11] p-4">
               <div className="font-display text-2xl font-black text-white">{t.value}</div>

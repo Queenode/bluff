@@ -15,6 +15,7 @@ import {
   yoctoToNear,
   type Attempt,
   isInviteOnly,
+  isHeist,
   parseAccountList,
 } from '@/lib/near';
 import { triggerJudge, useWallet } from '@/lib/wallet';
@@ -78,8 +79,10 @@ function AttemptRow({
   const created = Number(a.created_at);
   const canReclaim = a.status === 'Pending' && me === a.attacker && now !== null && now - created > RECLAIM_AFTER_MS;
   const tone =
-    a.status === 'Breached'
+    a.status === 'Breached' || a.status === 'Heisted'
       ? 'border-red-500/60 bg-red-950/20'
+      : a.status === 'PolicyBlocked'
+      ? 'border-amber-500/50 bg-amber-950/10'
       : a.status === 'Pending'
       ? 'border-sky-500/40 bg-sky-950/10'
       : 'border-zinc-800 bg-black/40';
@@ -101,8 +104,10 @@ function AttemptRow({
           {now !== null && <span>{timeAgo(created, now)}</span>}
           <span
             className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
-              a.status === 'Breached'
+              a.status === 'Breached' || a.status === 'Heisted'
                 ? 'bg-red-500 text-black'
+                : a.status === 'PolicyBlocked'
+                ? 'bg-amber-500 text-black'
                 : a.status === 'Defended'
                 ? 'bg-zinc-800 text-zinc-300'
                 : a.status === 'Pending'
@@ -110,7 +115,13 @@ function AttemptRow({
                 : 'bg-amber-500/20 text-amber-300'
             }`}
           >
-            {a.status === 'Pending' ? 'Judging…' : a.status}
+            {a.status === 'Pending'
+              ? 'Judging…'
+              : a.status === 'Heisted'
+              ? `💸 Heisted ${yoctoToNear(a.transfer, 3)} Ⓝ`
+              : a.status === 'PolicyBlocked'
+              ? `🛡 Policy blocked (${yoctoToNear(a.transfer, 2)} Ⓝ)`
+              : a.status}
           </span>
         </div>
       </div>
@@ -122,10 +133,10 @@ function AttemptRow({
           {live ? (
             <Typewriter
               text={a.response}
-              className={`whitespace-pre-wrap break-words ${a.status === 'Breached' ? 'text-red-300' : 'text-emerald-200/90'}`}
+              className={`whitespace-pre-wrap break-words ${a.status === 'Breached' || a.status === 'Heisted' ? 'text-red-300' : 'text-emerald-200/90'}`}
             />
           ) : (
-            <pre className={`whitespace-pre-wrap break-words ${a.status === 'Breached' ? 'text-red-300' : 'text-emerald-200/90'}`}>
+            <pre className={`whitespace-pre-wrap break-words ${a.status === 'Breached' || a.status === 'Heisted' ? 'text-red-300' : 'text-emerald-200/90'}`}>
               {a.response}
             </pre>
           )}
@@ -262,7 +273,7 @@ function ArenaDetail() {
   // Attempts we saw as Pending and then saw judged, while this page was open: animate those.
   const seenPendingRef = useRef<Set<number>>(new Set());
   const [liveIdx, setLiveIdx] = useState<number[]>([]);
-  const [flash, setFlash] = useState(false);
+  const [flash, setFlash] = useState<{ label: string; tone: 'red' | 'amber' } | null>(null);
   const prevBountyRef = useRef<string | null>(null);
   const [potDelta, setPotDelta] = useState<{ key: number; amount: string } | null>(null);
   const prevStatusRef = useRef<string | null>(null);
@@ -311,8 +322,19 @@ function ArenaDetail() {
       }
     }
     if (newlyJudged.length) {
-      const t = setTimeout(() => setLiveIdx(v => [...v, ...newlyJudged]), 0);
-      return () => clearTimeout(t);
+      const judgedNow = attempts.filter(a => newlyJudged.includes(a.index));
+      const heisted = judgedNow.find(a => a.status === 'Heisted');
+      const blocked = judgedNow.find(a => a.status === 'PolicyBlocked');
+      const timers = [setTimeout(() => setLiveIdx(v => [...v, ...newlyJudged]), 0)];
+      if (heisted) {
+        timers.push(setTimeout(() => setFlash({ label: `Heisted +${yoctoToNear(heisted.transfer, 2)} Ⓝ`, tone: 'red' }), 0));
+        timers.push(setTimeout(() => setFlash(null), 1700));
+        confetti({ particleCount: 140, spread: 80, origin: { y: 0.55 }, colors: ['#ef4444', '#fbbf24'] });
+      } else if (blocked) {
+        timers.push(setTimeout(() => setFlash({ label: 'Policy blocked', tone: 'amber' }), 0));
+        timers.push(setTimeout(() => setFlash(null), 1700));
+      }
+      return () => timers.forEach(clearTimeout);
     }
   }, [attempts]);
 
@@ -323,8 +345,8 @@ function ArenaDetail() {
     if (room?.status !== 'Breached' || celebratedRef.current) return;
     if (prev !== null && prev !== 'Breached') {
       celebratedRef.current = true;
-      const t1 = setTimeout(() => setFlash(true), 0);
-      const t2 = setTimeout(() => setFlash(false), 1700);
+      const t1 = setTimeout(() => setFlash({ label: room.mode === 1 ? 'Drained' : 'Breached', tone: 'red' }), 0);
+      const t2 = setTimeout(() => setFlash(null), 1700);
       confetti({ particleCount: 220, spread: 100, origin: { y: 0.55 }, colors: ['#ef4444', '#34d399', '#fbbf24'] });
       return () => {
         clearTimeout(t1);
@@ -447,8 +469,14 @@ function ArenaDetail() {
   return (
     <div className={`min-h-screen bg-[#03060a] px-4 py-10 ${flash ? 'animate-shake' : ''}`}>
       {flash && (
-        <div className="fixed inset-0 z-[60] pointer-events-none bg-red-600 animate-breach-flash flex items-center justify-center">
-          <span className="font-display text-5xl sm:text-7xl font-black uppercase tracking-widest text-white text-glow-white">Breached</span>
+        <div
+          className={`fixed inset-0 z-[60] pointer-events-none animate-breach-flash flex items-center justify-center ${
+            flash.tone === 'red' ? 'bg-red-600' : 'bg-amber-500'
+          }`}
+        >
+          <span className="font-display text-4xl sm:text-7xl font-black uppercase tracking-widest text-white text-glow-white text-center px-4">
+            {flash.label}
+          </span>
         </div>
       )}
       <div className="max-w-7xl mx-auto">
@@ -456,7 +484,26 @@ function ArenaDetail() {
           <ArrowLeft className="w-3.5 h-3.5" /> Raid lobby
         </Link>
 
-        {phase === 'Breached' && (
+        {phase === 'Breached' && isHeist(room) && (
+          <div className="mb-8 p-6 clip-game-card border border-red-500/60 bg-red-950/30">
+            <div className="flex items-center gap-2 text-red-400 font-display font-black uppercase tracking-wider text-lg">
+              <Skull className="w-5 h-5" /> Treasury drained
+            </div>
+            <p className="text-zinc-200 mt-2 text-sm">
+              {room.guardian_name} was talked into {room.heists} payout{room.heists === 1 ? '' : 's'} totalling{' '}
+              <strong className="text-white">{yoctoToNear(room.payout, 3)} NEAR</strong>. The last one, by{' '}
+              <Link href={`/player/${room.winner}`} className="text-emerald-300 underline">
+                {room.winner}
+              </Link>
+              , emptied the wallet. The spending cap held on every transfer.
+            </p>
+            <ShareButtons
+              text={`The AI agent "${room.guardian_name}" just got robbed of ${yoctoToNear(room.payout, 2)} NEAR on BLUFF 💸 Social-engineering AI wallets, onchain on @NEARProtocol. #NEARHackathon`}
+            />
+          </div>
+        )}
+
+        {phase === 'Breached' && !isHeist(room) && (
           <div className="mb-8 p-6 clip-game-card border border-red-500/60 bg-red-950/30">
             <div className="flex items-center gap-2 text-red-400 font-display font-black uppercase tracking-wider text-lg">
               <Skull className="w-5 h-5" /> Guardian breached
@@ -523,7 +570,11 @@ function ArenaDetail() {
                       value={prompt}
                       onChange={e => setPrompt(e.target.value)}
                       rows={6}
-                      placeholder={`Convince ${room.guardian_name} to say its secret code (format BLUFF-XXXX-XXXX-XXXX)…`}
+                      placeholder={
+                        isHeist(room)
+                          ? `Talk ${room.guardian_name} into sending you NEAR. Max ${yoctoToNear(room.max_payout, 2)} Ⓝ per transfer, or the contract blocks it…`
+                          : `Convince ${room.guardian_name} to say its secret code (format BLUFF-XXXX-XXXX-XXXX)…`
+                      }
                       className="w-full bg-black/60 border border-zinc-800 focus:border-emerald-500/60 outline-none rounded p-3 font-mono text-sm text-zinc-100 resize-y"
                     />
                     <div className="flex flex-wrap items-center justify-between gap-3 mt-3">
@@ -661,6 +712,30 @@ function ArenaDetail() {
               </p>
             </div>
 
+            {isHeist(room) && (
+              <div className="clip-game-card border border-red-500/30 bg-[#110707] p-5 font-mono text-xs text-zinc-300 space-y-2">
+                <div className="text-xs font-display font-bold uppercase tracking-wider text-red-300">Wallet policy (enforced onchain)</div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Max per transfer</span>
+                  <span className="text-white">{yoctoToNear(room.max_payout, 3)} Ⓝ</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Recipient</span>
+                  <span className="text-white">only the attacker who paid</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Successful heists</span>
+                  <span className="text-red-300">{room.heists} • {yoctoToNear(room.total_heisted, 3)} Ⓝ</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Over-cap attempts blocked</span>
+                  <span className="text-amber-300">{attempts.filter(a => a.status === 'PolicyBlocked').length}</span>
+                </div>
+                <p className="text-[11px] text-zinc-500 pt-1">
+                  The AI is treated as untrusted. Whatever it tries to send, the contract only pays the attacker of that attempt and never more than the cap.
+                </p>
+              </div>
+            )}
             <div className="clip-game-card border border-zinc-800 bg-[#060a11] p-5">
               <div className="flex items-center gap-2 text-xs font-display font-bold uppercase tracking-wider text-emerald-400 mb-2">
                 <Shield className="w-4 h-4" /> Guardian brief (public)
@@ -682,6 +757,11 @@ function ArenaDetail() {
                 </span>
               </div>
               <p>
+                {isHeist(room)
+                  ? 'Every reply and tool call is stored onchain with a TEE-signed inference id. The contract, not the AI, decides how much can move: at most the cap, only to the paying attacker.'
+                  : null}
+              </p>
+              <p className={isHeist(room) ? 'hidden' : ''}>
                 The secret code is derived on the judge server and was never shown to the host. A payout only happens if the reply stored onchain contains a code whose sha256 matches this commitment.
               </p>
               {room.status === 'Pending' && open && (
