@@ -42,7 +42,38 @@ import {
 const MAX_PROMPT_BYTES = 1000;
 const RECLAIM_AFTER_MS = 30 * 60 * 1000;
 
-function AttemptRow({ a, me, onReclaim, busy }: { a: Attempt; me: string | null; onReclaim: (a: Attempt) => void; busy: boolean }) {
+/** Reveals text character by character; used for replies that were judged while you watched. */
+function Typewriter({ text, className }: { text: string; className: string }) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    const step = Math.max(1, Math.round(text.length / 120));
+    const t = setInterval(() => {
+      setN(v => {
+        if (v >= text.length) {
+          clearInterval(t);
+          return v;
+        }
+        return Math.min(text.length, v + step);
+      });
+    }, 18);
+    return () => clearInterval(t);
+  }, [text]);
+  return <pre className={`${className} ${n < text.length ? 'typing-caret' : ''}`}>{text.slice(0, n)}</pre>;
+}
+
+function AttemptRow({
+  a,
+  me,
+  onReclaim,
+  busy,
+  live,
+}: {
+  a: Attempt;
+  me: string | null;
+  onReclaim: (a: Attempt) => void;
+  busy: boolean;
+  live: boolean;
+}) {
   const now = useNow(10_000);
   const created = Number(a.created_at);
   const canReclaim = a.status === 'Pending' && me === a.attacker && now !== null && now - created > RECLAIM_AFTER_MS;
@@ -88,9 +119,16 @@ function AttemptRow({ a, me, onReclaim, busy }: { a: Attempt; me: string | null;
       {a.response !== null ? (
         <>
           <div className="text-zinc-400 mb-1">&gt; guardian</div>
-          <pre className={`whitespace-pre-wrap break-words ${a.status === 'Breached' ? 'text-red-300' : 'text-emerald-200/90'}`}>
-            {a.response}
-          </pre>
+          {live ? (
+            <Typewriter
+              text={a.response}
+              className={`whitespace-pre-wrap break-words ${a.status === 'Breached' ? 'text-red-300' : 'text-emerald-200/90'}`}
+            />
+          ) : (
+            <pre className={`whitespace-pre-wrap break-words ${a.status === 'Breached' ? 'text-red-300' : 'text-emerald-200/90'}`}>
+              {a.response}
+            </pre>
+          )}
         </>
       ) : a.status === 'Pending' ? (
         <div className="flex items-center gap-2 text-sky-300">
@@ -221,6 +259,13 @@ function ArenaDetail() {
   const [msg, setMsg] = useState<{ kind: 'error' | 'info' | 'success'; text: string; tx?: string | null } | null>(null);
   const judgingRef = useRef(false);
   const celebratedRef = useRef(false);
+  // Attempts we saw as Pending and then saw judged, while this page was open: animate those.
+  const seenPendingRef = useRef<Set<number>>(new Set());
+  const [liveIdx, setLiveIdx] = useState<number[]>([]);
+  const [flash, setFlash] = useState(false);
+  const prevBountyRef = useRef<string | null>(null);
+  const [potDelta, setPotDelta] = useState<{ key: number; amount: string } | null>(null);
+  const prevStatusRef = useRef<string | null>(null);
 
   const refreshRoom = roomQ.refresh;
   const refreshAttempts = attemptsQ.refresh;
@@ -257,11 +302,52 @@ function ArenaDetail() {
   }, [search, kickJudge]);
 
   useEffect(() => {
-    if (room?.status === 'Breached' && room.winner === accountId && !celebratedRef.current) {
+    const newlyJudged: number[] = [];
+    for (const a of attempts) {
+      if (a.status === 'Pending') seenPendingRef.current.add(a.index);
+      else if (seenPendingRef.current.has(a.index)) {
+        seenPendingRef.current.delete(a.index);
+        newlyJudged.push(a.index);
+      }
+    }
+    if (newlyJudged.length) {
+      const t = setTimeout(() => setLiveIdx(v => [...v, ...newlyJudged]), 0);
+      return () => clearTimeout(t);
+    }
+  }, [attempts]);
+
+  // Breach happened while watching: flash + shake + confetti for everyone in the room.
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = room?.status ?? null;
+    if (room?.status !== 'Breached' || celebratedRef.current) return;
+    if (prev !== null && prev !== 'Breached') {
+      celebratedRef.current = true;
+      const t1 = setTimeout(() => setFlash(true), 0);
+      const t2 = setTimeout(() => setFlash(false), 1700);
+      confetti({ particleCount: 220, spread: 100, origin: { y: 0.55 }, colors: ['#ef4444', '#34d399', '#fbbf24'] });
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+    if (prev === null && room.winner === accountId) {
       celebratedRef.current = true;
       confetti({ particleCount: 180, spread: 90, origin: { y: 0.6 } });
     }
   }, [room?.status, room?.winner, accountId]);
+
+  // Pot grew: pop the number and float "+x".
+  useEffect(() => {
+    if (!room) return;
+    const prev = prevBountyRef.current;
+    prevBountyRef.current = room.bounty;
+    if (prev !== null && BigInt(room.bounty) > BigInt(prev) && room.status !== 'Breached') {
+      const amount = yoctoToNear(BigInt(room.bounty) - BigInt(prev), 3);
+      const t = setTimeout(() => setPotDelta({ key: Date.now(), amount }), 0);
+      return () => clearTimeout(t);
+    }
+  }, [room]);
 
   if (roomQ.loading && !room) {
     return (
@@ -359,7 +445,12 @@ function ArenaDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-[#03060a] px-4 py-10">
+    <div className={`min-h-screen bg-[#03060a] px-4 py-10 ${flash ? 'animate-shake' : ''}`}>
+      {flash && (
+        <div className="fixed inset-0 z-[60] pointer-events-none bg-red-600 animate-breach-flash flex items-center justify-center">
+          <span className="font-display text-5xl sm:text-7xl font-black uppercase tracking-widest text-white text-glow-white">Breached</span>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto">
         <Link href="/arenas" className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-emerald-400 mb-6">
           <ArrowLeft className="w-3.5 h-3.5" /> Raid lobby
@@ -507,7 +598,7 @@ function ArenaDetail() {
               ) : (
                 <div className="space-y-3">
                   {attempts.map(a => (
-                    <AttemptRow key={a.index} a={a} me={accountId} onReclaim={reclaim} busy={busy} />
+                    <AttemptRow key={a.index} a={a} me={accountId} onReclaim={reclaim} busy={busy} live={liveIdx.includes(a.index)} />
                   ))}
                 </div>
               )}
@@ -532,12 +623,19 @@ function ArenaDetail() {
               </div>
             )}
             {squad && <InvitePanel room={room} isHost={isHost} busy={busy} onAdd={addInvites} />}
-            <div className="clip-game-card border border-zinc-800 bg-[#060a11] p-5">
+            <div className="relative clip-game-card border border-zinc-800 bg-[#060a11] p-5">
               <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
                 {phase === 'Breached' ? 'Paid out' : 'Loot pot (escrowed)'}
               </div>
               <div className="font-display text-4xl font-black text-white mt-1">
-                {yoctoToNear(phase === 'Breached' ? room.payout : room.bounty, 3)}{' '}
+                <span key={potDelta?.key ?? 0} className={potDelta ? 'animate-pot-pop' : ''}>
+                  {yoctoToNear(phase === 'Breached' ? room.payout : room.bounty, 3)}
+                </span>{' '}
+                {potDelta && (
+                  <span key={`d${potDelta.key}`} className="absolute right-5 top-4 text-sm font-mono text-emerald-400 animate-float-up">
+                    +{potDelta.amount} Ⓝ
+                  </span>
+                )}
                 <span className="text-emerald-400 text-base">NEAR</span>
               </div>
               <div className="grid grid-cols-2 gap-3 mt-4 text-xs font-mono">
