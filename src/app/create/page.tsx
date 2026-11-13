@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Lock, PlusCircle, ShieldCheck } from 'lucide-react';
-import { api, DIFFICULTIES, nearToYocto, yoctoToNear } from '@/lib/near';
+import { ArrowLeft, Globe, Loader2, Lock, PlusCircle, ShieldCheck, Users } from 'lucide-react';
+import { api, DIFFICULTIES, nearToYocto, parseAccountList, yoctoToNear } from '@/lib/near';
 import { triggerJudge, useWallet } from '@/lib/wallet';
 
 const DURATIONS = [
@@ -46,6 +46,9 @@ export default function CreateVaultPage() {
   const [bounty, setBounty] = useState('2');
   const [entryFee, setEntryFee] = useState('0.2');
   const [duration, setDuration] = useState(1440);
+  const [squad, setSquad] = useState(false);
+  const [inviteText, setInviteText] = useState('');
+  const invites = parseAccountList(inviteText);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,6 +64,9 @@ export default function CreateVaultPage() {
     if (!systemPrompt.trim()) return setError('Write the guardian persona / system prompt.');
     if (!(bountyNum >= 0.5)) return setError('Bounty must be at least 0.5 NEAR.');
     if (!(feeNum >= 0.1)) return setError('Per-prompt fee must be at least 0.1 NEAR.');
+    if (squad && invites.valid.length === 0) return setError('Add at least one friend\'s NEAR account to the invite list.');
+    if (squad && invites.invalid.length) return setError(`Not valid NEAR accounts: ${invites.invalid.join(', ')}`);
+    if (squad && invites.valid.length > 50) return setError('At most 50 invited players.');
     if (balance && BigInt(nearToYocto(deposit)) > BigInt(balance)) return setError('Not enough NEAR in your wallet.');
 
     setBusy(true);
@@ -75,6 +81,7 @@ export default function CreateVaultPage() {
           difficulty,
           entry_fee: nearToYocto(feeNum),
           duration_minutes: duration,
+          invited: squad ? invites.valid.filter(a => a !== accountId) : null,
         },
         nearToYocto(deposit),
         50,
@@ -112,6 +119,56 @@ export default function CreateVaultPage() {
 
         <form onSubmit={submit} className="mt-8 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-8">
           <div className="space-y-6">
+            <div>
+              <label className={label}>Who can attack?</label>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {[
+                  { v: false, icon: <Globe className="w-4 h-4" />, t: 'Open arena', d: 'Listed in the lobby. Anyone with a wallet can take a shot.' },
+                  { v: true, icon: <Users className="w-4 h-4" />, t: 'Squad (invite-only)', d: 'Hidden from the lobby. Only the friends you list can attack; everyone can spectate via the link.' },
+                ].map(o => (
+                  <button
+                    type="button"
+                    key={o.t}
+                    onClick={() => setSquad(o.v)}
+                    className={`text-left p-3 clip-game-card border transition-colors ${
+                      squad === o.v ? 'border-emerald-400 bg-emerald-950/40' : 'border-zinc-800 bg-[#060a11] hover:border-emerald-500/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 font-display text-xs font-black uppercase tracking-wider text-white">
+                      <span className="text-emerald-400">{o.icon}</span> {o.t}
+                    </div>
+                    <div className="text-[11px] text-zinc-400 mt-1">{o.d}</div>
+                  </button>
+                ))}
+              </div>
+              {squad && (
+                <div className="mt-3">
+                  <textarea
+                    className={`${input} resize-y`}
+                    rows={3}
+                    value={inviteText}
+                    onChange={e => setInviteText(e.target.value)}
+                    placeholder="alice.testnet, bob.testnet, carol.testnet"
+                  />
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {invites.valid.map(a => (
+                      <span key={a} className="px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30 text-[11px] font-mono text-emerald-300">
+                        {a}
+                      </span>
+                    ))}
+                    {invites.invalid.map(a => (
+                      <span key={a} className="px-2 py-0.5 rounded bg-red-950/60 border border-red-500/40 text-[11px] font-mono text-red-300 line-through">
+                        {a}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-[11px] font-mono text-zinc-500 mt-1">
+                    Friends&apos; NEAR account ids, separated by commas or spaces. You can invite more later from the vault page. You (the host) can&apos;t attack your own vault.
+                  </p>
+                </div>
+              )}
+            </div>
+
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className={label}>Vault name</label>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { api, difficultyOf, yoctoToNear } from '@/lib/near';
+import { api, difficultyOf, isInviteOnly, yoctoToNear } from '@/lib/near';
 import { useChain } from '@/lib/useChain';
 import { CinematicBackgroundCanvas } from '@/components/CinematicBackgroundCanvas';
 import { WireframeMeshCanvas } from '@/components/WireframeMeshCanvas';
@@ -20,7 +20,8 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
-  const { data: rooms = [] } = useChain(() => api.rooms(0, 30), [], 15_000);
+  const { data: allRooms } = useChain(() => api.rooms(0, 30), [], 15_000);
+  const rooms = (allRooms ?? []).filter(r => !isInviteOnly(r));
   const { data: stats } = useChain(() => api.stats(), [], 15_000);
 
   // Duplicate ticker list for a seamless marquee (repeat short lists so the strip is full)

@@ -2,10 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { difficultyOf, roomPhase, shortAccount, yoctoToNear, type Room } from '@/lib/near';
+import { difficultyOf, isInviteOnly, roomPhase, shortAccount, yoctoToNear, type Room } from '@/lib/near';
 import { useNow } from '@/lib/useChain';
 import { ChallengeTimer } from '@/components/ChallengeTimer';
-import { Shield, Swords, Skull, AlertTriangle, Loader2 } from 'lucide-react';
+import { Shield, Swords, Skull, AlertTriangle, Loader2, Lock } from 'lucide-react';
 
 export const ArenaCard: React.FC<{ room: Room }> = ({ room }) => {
   const now = useNow(5000);
@@ -34,7 +34,12 @@ export const ArenaCard: React.FC<{ room: Room }> = ({ room }) => {
       <div className="p-5 flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between gap-2 mb-4">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+              {isInviteOnly(room) && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/40 text-amber-300">
+                  <Lock className="w-2.5 h-2.5" /> SQUAD
+                </span>
+              )}
               VAULT #{room.id} • by {shortAccount(room.host, 20)}
             </span>
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border text-[10px] font-display font-extrabold uppercase border-emerald-500/40 bg-emerald-950/60 text-emerald-300">

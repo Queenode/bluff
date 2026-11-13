@@ -53,6 +53,12 @@ export default function HowItWorksPage() {
           ))}
         </div>
 
+        <h2 className="font-display text-xl font-black uppercase tracking-wider text-white mt-12 mb-3">Open arenas and squads</h2>
+        <ul className="text-sm text-zinc-300 space-y-2 list-disc pl-5">
+          <li><strong>Open arena:</strong> listed in the lobby; any wallet can attack.</li>
+          <li><strong>Squad:</strong> the host lists friends&apos; accounts and the contract rejects everyone else. Hidden from the lobby, but anyone with the link can spectate. Nobody, including the host, knows the secret.</li>
+        </ul>
+
         <h2 className="font-display text-xl font-black uppercase tracking-wider text-white mt-12 mb-3">Defense levels</h2>
         <ul className="text-sm text-zinc-300 space-y-2 list-disc pl-5">
           <li><strong>Standard:</strong> host persona + the secret. Raw model behavior.</li>

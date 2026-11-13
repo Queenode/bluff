@@ -9,7 +9,7 @@ Built for **NEAR HACKATHON 2026**. Tracks: **AI Security & Defense**, **Games Wi
 | | |
 |---|---|
 | Live app | _see the submission post; or run locally in 2 minutes (below)_ |
-| Contract (testnet) | [`bluff-arena-76371.testnet`](https://testnet.nearblocks.io/address/bluff-arena-76371.testnet) |
+| Contract (testnet) | [`bluff-vault-76371.testnet`](https://testnet.nearblocks.io/address/bluff-vault-76371.testnet) |
 | Judge / oracle account | [`bluff-oracle-76371.testnet`](https://testnet.nearblocks.io/address/bluff-oracle-76371.testnet) |
 | Guardian model | `Qwen/Qwen3.6-35B-A3B-FP8` on **NEAR AI Cloud** (TEE, signed responses) |
 
@@ -47,6 +47,11 @@ AI agents are starting to custody funds. Their most common failure is a well-cra
 5. **Contract verifies**: a breach is only accepted if `sha256(code)` matches the commitment **and** the stored reply literally contains the code. The pot then goes to the attacker in the same transaction. Any attempts queued behind the winner are refunded in full.
 6. **Liveness**: attempts are judged strictly in order. If the judge stalls for 30 minutes, the attacker calls **`reclaim_attempt`** for a full refund. After the deadline the host calls **`refund_room`**.
 
+### Open arenas and squad vaults
+
+* **Open arena**: listed in the lobby; any wallet can attack.
+* **Squad (invite-only)**: the host lists up to 50 friends' accounts at creation (or later with `add_invites`). The contract rejects attempts from anyone else, and squad vaults are hidden from the lobby. Anyone with the link can still spectate the live transcript. The host can never attack their own vault, and nobody, including the host, knows the secret code.
+
 ### Defense levels (enforced by the judge)
 
 | Level | What the attacker is up against |
@@ -73,7 +78,7 @@ Requires Node ≥ 22 and a NEAR **testnet** wallet (e.g. [MyNearWallet testnet](
 ```bash
 git clone https://github.com/Queenode/bluff.git && cd bluff
 npm install
-cp .env.example .env.local     # public values already point at bluff-arena-76371.testnet
+cp .env.example .env.local     # public values already point at bluff-vault-76371.testnet
 npm run dev                    # http://localhost:3000
 ```
 
@@ -85,6 +90,7 @@ Without `ORACLE_*`/`LLM_*` server env vars you can still browse every vault, tra
 | Open a vault, connect wallet, write a prompt, click **Attack** | Wallet asks you to pay the fee → prompt appears in the transcript as *Judging…* → within ~10 s the guardian's reply is written onchain and shown, tagged *Defended* or *Breached* |
 | Click **TEE signature** under a judged reply | NEAR AI Cloud's enclave signature for that exact completion |
 | Get the guardian to output its `BLUFF-XXXX-XXXX-XXXX` code | Banner shows the leaked code + payout; your wallet balance jumps by the pot; the tx is visible on nearblocks |
+| Open `/create`, choose **Squad**, list a friend's testnet account, lock ≥ 0.55 NEAR | Vault is hidden from the lobby; your friend can attack it, any other wallet sees *spectator* mode and the contract rejects its attempts |
 | Open `/create`, fill in a persona, lock ≥ 0.55 NEAR | New vault appears in the lobby as *Arming* and becomes live once the judge commits the hash |
 | Open `/cve` (Hall of Breaches) | Totals, attack-vector breakdown, leaderboard, breach archive, **Export dataset (JSON)** |
 | After a vault's deadline, as its host | **Reclaim pot** button calls `refund_room` |
@@ -104,7 +110,7 @@ npm run dev
 cd contracts/bluff_escrow && cargo test
 ```
 
-The 10 unit tests cover a full breach payout, refunds for attempts queued behind a winner, wrong-canary and canary-not-in-reply rejection, oracle-only judging, hosts not being able to attack their own vault, expiry, attacker reclaim after a judge stall, host refund, and cancelling an unarmed vault.
+The 13 unit tests cover invite-only vaults (invited player allowed, outsider rejected, host adds invites), a full breach payout, refunds for attempts queued behind a winner, wrong-canary and canary-not-in-reply rejection, oracle-only judging, hosts not being able to attack their own vault, expiry, attacker reclaim after a judge stall, host refund, and cancelling an unarmed vault.
 
 ---
 

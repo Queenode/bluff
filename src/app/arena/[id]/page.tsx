@@ -14,6 +14,8 @@ import {
   txUrl,
   yoctoToNear,
   type Attempt,
+  isInviteOnly,
+  parseAccountList,
 } from '@/lib/near';
 import { triggerJudge, useWallet } from '@/lib/wallet';
 import { useChain, useNow } from '@/lib/useChain';
@@ -30,6 +32,11 @@ import {
   RotateCcw,
   Fingerprint,
   AlertTriangle,
+  Users,
+  Copy,
+  Check,
+  Share2,
+  UserPlus,
 } from 'lucide-react';
 
 const MAX_PROMPT_BYTES = 1000;
@@ -116,6 +123,87 @@ function AttemptRow({ a, me, onReclaim, busy }: { a: Attempt; me: string | null;
   );
 }
 
+function ShareButtons({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const url = typeof window !== 'undefined' ? window.location.href.split('?')[0] : '';
+  return (
+    <div className="flex flex-wrap gap-2 mt-3">
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(url).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          });
+        }}
+        className="px-3 py-2 clip-game-btn bg-zinc-900 border border-zinc-700 hover:border-emerald-500/50 text-[11px] font-display font-bold uppercase tracking-wider text-zinc-200 inline-flex items-center gap-1.5"
+      >
+        {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+        {copied ? 'Copied' : 'Copy link'}
+      </button>
+      <a
+        href={`https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`}
+        target="_blank"
+        rel="noreferrer"
+        className="px-3 py-2 clip-game-btn bg-zinc-900 border border-zinc-700 hover:border-emerald-500/50 text-[11px] font-display font-bold uppercase tracking-wider text-zinc-200 inline-flex items-center gap-1.5"
+      >
+        <Share2 className="w-3.5 h-3.5" /> Post on X
+      </a>
+    </div>
+  );
+}
+
+function InvitePanel({
+  room,
+  isHost,
+  busy,
+  onAdd,
+}: {
+  room: { invited: string[]; host: string };
+  isHost: boolean;
+  busy: boolean;
+  onAdd: (accounts: string[]) => Promise<boolean>;
+}) {
+  const [text, setText] = useState('');
+  const parsed = parseAccountList(text);
+  const fresh = parsed.valid.filter(a => a !== room.host && !room.invited.includes(a));
+  return (
+    <div className="clip-game-card border border-amber-500/30 bg-[#0c0a06] p-5">
+      <div className="flex items-center gap-2 text-xs font-display font-bold uppercase tracking-wider text-amber-300 mb-3">
+        <Users className="w-4 h-4" /> Squad • {room.invited.length} invited
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {room.invited.map(a => (
+          <Link key={a} href={`/player/${a}`} className="px-2 py-0.5 rounded bg-black/50 border border-zinc-700 text-[11px] font-mono text-zinc-200 hover:border-amber-400/50">
+            {a}
+          </Link>
+        ))}
+      </div>
+      {isHost && (
+        <div className="mt-4">
+          <input
+            value={text}
+            onChange={e => setText(e.target.value)}
+            placeholder="friend.testnet, other.testnet"
+            className="w-full bg-black/60 border border-zinc-800 focus:border-amber-500/60 outline-none rounded px-3 py-2 font-mono text-xs text-zinc-100"
+          />
+          {parsed.invalid.length > 0 && (
+            <p className="text-[11px] font-mono text-red-300 mt-1">Invalid: {parsed.invalid.join(', ')}</p>
+          )}
+          <button
+            disabled={busy || fresh.length === 0 || parsed.invalid.length > 0}
+            onClick={async () => {
+              if (await onAdd(fresh)) setText('');
+            }}
+            className="mt-2 w-full py-2 clip-game-btn bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-black font-display font-black text-[11px] uppercase tracking-wider inline-flex items-center justify-center gap-1.5"
+          >
+            <UserPlus className="w-3.5 h-3.5" /> Invite {fresh.length || ''} (0.01 Ⓝ storage)
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ArenaDetail() {
   const params = useParams();
   const search = useSearchParams();
@@ -198,6 +286,9 @@ function ArenaDetail() {
   const isHost = accountId === room.host;
   const open = phase === 'Live' || phase === 'Arming';
   const promptBytes = new TextEncoder().encode(prompt).length;
+  const squad = isInviteOnly(room);
+  const invitedMe = !!accountId && room.invited.includes(accountId);
+  const spectator = squad && !isHost && !!accountId && !invitedMe;
   const myPending = attempts.filter(a => a.attacker === accountId && a.status === 'Pending').length;
 
   const submit = async () => {
@@ -251,6 +342,22 @@ function ArenaDetail() {
     }
   };
 
+  const addInvites = async (accounts: string[]) => {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const r = await call('add_invites', { room_id: room.id, accounts }, '10000000000000000000000', 30);
+      setMsg({ kind: 'success', text: `Invited ${accounts.join(', ')}.`, tx: r.txHash });
+      refresh();
+      return true;
+    } catch (e) {
+      setMsg({ kind: 'error', text: e instanceof Error ? e.message : String(e) });
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#03060a] px-4 py-10">
       <div className="max-w-7xl mx-auto">
@@ -272,6 +379,9 @@ function ArenaDetail() {
               {room.winning_attempt}. The contract checked sha256 of that code against the hash committed before the first attack and paid out{' '}
               <strong className="text-white">{yoctoToNear(room.payout, 3)} NEAR</strong>.
             </p>
+            <ShareButtons
+              text={`${room.winner === accountId ? 'I' : room.winner} just tricked the AI guardian "${room.guardian_name}" into leaking its secret and won ${yoctoToNear(room.payout, 2)} NEAR on BLUFF 🃏 Every prompt is onchain on @NEARProtocol. #NEARHackathon`}
+            />
           </div>
         )}
 
@@ -304,7 +414,15 @@ function ArenaDetail() {
                 </div>
               </div>
               {open ? (
-                isHost ? (
+                spectator ? (
+                  <div className="text-sm font-mono text-zinc-300 flex items-start gap-2">
+                    <Users className="w-4 h-4 text-amber-300 mt-0.5 shrink-0" />
+                    <span>
+                      This is an invite-only squad vault and <span className="text-amber-300">{accountId}</span> isn&apos;t on the list.
+                      You can still watch every attempt live below. Ask <span className="text-emerald-300">{room.host}</span> to invite you.
+                    </span>
+                  </div>
+                ) : isHost ? (
                   <p className="text-sm text-zinc-400 font-mono">
                     You host this vault, so the contract will not let you attack it. Share the link and watch the attempts roll in.
                   </p>
@@ -398,6 +516,22 @@ function ArenaDetail() {
 
           {/* Side column */}
           <aside className="space-y-5">
+            {open && (
+              <div className="clip-game-card border border-emerald-500/30 bg-[#060c10] p-5">
+                <div className="text-xs font-display font-bold uppercase tracking-wider text-emerald-400 mb-2">
+                  {squad ? 'Rally your squad' : 'Bring challengers'}
+                </div>
+                <p className="text-[11px] font-mono text-zinc-400 mb-3">
+                  {squad
+                    ? 'Only invited wallets can attack. Anyone with the link can spectate.'
+                    : 'Every failed prompt makes the pot bigger. Share the vault.'}
+                </p>
+                <ShareButtons
+                  text={`Can you trick "${room.guardian_name}" into leaking its secret? ${yoctoToNear(room.bounty, 2)} NEAR pot on BLUFF, built on @NEARProtocol. #NEARHackathon`}
+                />
+              </div>
+            )}
+            {squad && <InvitePanel room={room} isHost={isHost} busy={busy} onAdd={addInvites} />}
             <div className="clip-game-card border border-zinc-800 bg-[#060a11] p-5">
               <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
                 {phase === 'Breached' ? 'Paid out' : 'Loot pot (escrowed)'}

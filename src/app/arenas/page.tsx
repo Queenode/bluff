@@ -3,7 +3,8 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArenaCard } from '@/components/ArenaCard';
-import { api, roomPhase, yoctoToNear, CONTRACT_ID, accountUrl } from '@/lib/near';
+import { api, roomPhase, yoctoToNear, CONTRACT_ID, accountUrl, canSeeInLobby } from '@/lib/near';
+import { useWallet } from '@/lib/wallet';
 import { useChain, useNow } from '@/lib/useChain';
 import { Swords, Loader2, Plus, ExternalLink } from 'lucide-react';
 
@@ -14,18 +15,20 @@ export default function ArenasPage() {
   const { data: rooms, error, loading } = useChain(() => api.rooms(0, 100), [], 10_000);
   const now = useNow(10_000);
   const [filter, setFilter] = useState<Filter>('Live');
+  const { accountId } = useWallet();
 
   const filtered = useMemo(() => {
     if (!rooms) return [];
     const t = now ?? 0;
     return rooms.filter(r => {
+      if (!canSeeInLobby(r, accountId)) return false;
       const p = roomPhase(r, t || Number(r.created_at));
       if (filter === 'All') return true;
       if (filter === 'Live') return p === 'Live' || p === 'Arming';
       if (filter === 'Breached') return p === 'Breached';
       return p === 'Expired' || p === 'Refunded';
     });
-  }, [rooms, filter, now]);
+  }, [rooms, filter, now, accountId]);
 
   const livePot = useMemo(() => {
     if (!rooms || now === null) return null;

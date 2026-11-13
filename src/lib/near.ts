@@ -1,7 +1,7 @@
 // Shared (browser + server) helpers for reading the BLUFF contract over JSON-RPC.
 
 export const NETWORK_ID = (process.env.NEXT_PUBLIC_NETWORK_ID || 'testnet') as 'testnet' | 'mainnet';
-export const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID || 'bluff-arena-76371.testnet';
+export const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID || 'bluff-vault-76371.testnet';
 export const RPC_URL =
   process.env.NEXT_PUBLIC_RPC_URL ||
   (NETWORK_ID === 'mainnet' ? 'https://free.rpc.fastnear.com' : 'https://test.rpc.fastnear.com');
@@ -35,6 +35,7 @@ export interface Room {
   winning_attempt: number | null;
   revealed_canary: string | null;
   payout: string | null;
+  invited: string[];
 }
 
 export interface Attempt {
@@ -184,4 +185,31 @@ export function timeAgo(ms: number, now = Date.now()) {
   if (s < 3600) return `${Math.floor(s / 60)}m ago`;
   if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
   return `${Math.floor(s / 86400)}d ago`;
+}
+
+export const isInviteOnly = (room: Room) => room.invited.length > 0;
+
+/** Who may see a vault in the lobby: open vaults for everyone, invite-only ones for the host and invitees. */
+export function canSeeInLobby(room: Room, me: string | null) {
+  return !isInviteOnly(room) || (!!me && (room.host === me || room.invited.includes(me)));
+}
+
+export function canAttack(room: Room, me: string | null) {
+  return !!me && me !== room.host && (!isInviteOnly(room) || room.invited.includes(me));
+}
+
+const ACCOUNT_RE = /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
+export function parseAccountList(text: string): { valid: string[]; invalid: string[] } {
+  const parts = text
+    .split(/[\s,;]+/)
+    .map(s => s.trim().toLowerCase().replace(/^@/, ''))
+    .filter(Boolean);
+  const valid: string[] = [];
+  const invalid: string[] = [];
+  for (const p of parts) {
+    if (p.length >= 2 && p.length <= 64 && ACCOUNT_RE.test(p)) {
+      if (!valid.includes(p)) valid.push(p);
+    } else invalid.push(p);
+  }
+  return { valid, invalid };
 }

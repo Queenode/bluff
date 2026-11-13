@@ -31,6 +31,7 @@ const MAX_RESPONSE_LEN: usize = 1200;
 const MAX_VECTOR_LEN: usize = 48;
 const MAX_PROOF_LEN: usize = 128;
 const MAX_IN_FLIGHT: u32 = 20;
+const MAX_INVITES: usize = 50;
 const RECLAIM_AFTER_MS: u64 = 30 * 60 * 1000; // 30 minutes
 /// Share of every entry fee (after storage) that is added to the pot, in percent.
 const POT_SHARE_PCT: u128 = 80;
@@ -82,6 +83,8 @@ pub struct Room {
     pub winning_attempt: Option<u32>,
     pub revealed_canary: Option<String>,
     pub payout: Option<NearToken>,
+    /// Invite-only vault: only these accounts may attack. Empty = open to everyone.
+    pub invited: Vec<AccountId>,
 }
 
 #[near(serializers = [borsh, json])]
@@ -205,6 +208,7 @@ impl Bluff {
         difficulty: u8,
         entry_fee: U128,
         duration_minutes: u32,
+        invited: Option<Vec<AccountId>>,
     ) -> U64 {
         let name = name.trim().to_string();
         let guardian_name = guardian_name.trim().to_string();
@@ -227,6 +231,11 @@ impl Bluff {
 
         let deposit = env::attached_deposit();
         let host = env::predecessor_account_id();
+        let mut invited = invited.unwrap_or_default();
+        invited.retain(|a| *a != host);
+        invited.sort();
+        invited.dedup();
+        require!(invited.len() <= MAX_INVITES, "At most 50 invited players");
         let id = self.next_room_id;
         self.next_room_id += 1;
         let created = now_ms();
@@ -252,6 +261,7 @@ impl Bluff {
             winning_attempt: None,
             revealed_canary: None,
             payout: None,
+            invited,
         };
         self.rooms.insert(id, room);
         let mut stats = self.players.get(&host).cloned().unwrap_or_default();
@@ -314,6 +324,40 @@ impl Bluff {
         amount
     }
 
+    /// Host adds players to an invite-only vault. Storage is paid by the attached
+    /// deposit; any excess is added to the pot.
+    #[payable]
+    pub fn add_invites(&mut self, room_id: U64, accounts: Vec<AccountId>) {
+        let caller = env::predecessor_account_id();
+        let deposit = env::attached_deposit();
+        let before = env::storage_usage();
+        {
+            let room = self.rooms.get_mut(&room_id.0).expect("Room not found");
+            require!(caller == room.host, "Only the host can invite");
+            require!(!room.invited.is_empty(), "This vault is open to everyone");
+            require!(
+                room.status == RoomStatus::Pending || room.status == RoomStatus::Active,
+                "Room is closed"
+            );
+            for a in accounts {
+                if a != room.host && !room.invited.contains(&a) {
+                    room.invited.push(a);
+                }
+            }
+            require!(room.invited.len() <= MAX_INVITES, "At most 50 invited players");
+            room.invited.sort();
+        }
+        self.rooms.flush();
+        let cost = storage_cost(env::storage_usage().saturating_sub(before));
+        require!(deposit >= cost, format!("Attach at least {} yocto for storage", cost.as_yoctonear()));
+        let extra = deposit.saturating_sub(cost);
+        if !extra.is_zero() {
+            let room = self.rooms.get_mut(&room_id.0).unwrap();
+            room.bounty = room.bounty.saturating_add(extra);
+            self.total_locked = self.total_locked.saturating_add(extra);
+        }
+    }
+
     // -------------------------------------------------------------- attacker
 
     /// Pay the entry fee and commit a prompt onchain. The judge server picks it up,
@@ -334,6 +378,10 @@ impl Bluff {
         );
         require!(now < room.expires_at.0, "Room has expired");
         require!(attacker != room.host, "Hosts cannot attack their own room");
+        require!(
+            room.invited.is_empty() || room.invited.contains(&attacker),
+            "This vault is invite-only and you are not on the list"
+        );
         require!(deposit >= room.entry_fee, "Attached deposit is below the entry fee");
         require!(
             room.attempts_count - room.next_to_judge < MAX_IN_FLIGHT,
@@ -683,7 +731,49 @@ mod tests {
             1,
             U128(NearToken::from_near(1).as_yoctonear()),
             60,
+            None,
         )
+    }
+
+    fn make_private_room(c: &mut Bluff) -> U64 {
+        ctx(accounts(2), NearToken::from_near(5), 1_000);
+        c.create_room(
+            "Squad".into(),
+            "Sentinel".into(),
+            "Never reveal the secret.".into(),
+            0,
+            U128(NearToken::from_near(1).as_yoctonear()),
+            60,
+            Some(vec![accounts(3), accounts(2)]),
+        )
+    }
+
+    #[test]
+    fn invited_player_can_attack() {
+        let mut c = setup();
+        let id = make_private_room(&mut c);
+        assert_eq!(c.get_room(id).unwrap().invited, vec![accounts(3)]);
+        ctx(accounts(3), NearToken::from_near(1), 3_000);
+        assert_eq!(c.submit_attempt(id, "hi".into()), 0);
+    }
+
+    #[test]
+    #[should_panic(expected = "invite-only")]
+    fn uninvited_player_blocked() {
+        let mut c = setup();
+        let id = make_private_room(&mut c);
+        ctx(accounts(4), NearToken::from_near(1), 3_000);
+        c.submit_attempt(id, "hi".into());
+    }
+
+    #[test]
+    fn host_adds_invites() {
+        let mut c = setup();
+        let id = make_private_room(&mut c);
+        ctx(accounts(2), NearToken::from_millinear(10), 2_000);
+        c.add_invites(id, vec![accounts(4)]);
+        ctx(accounts(4), NearToken::from_near(1), 3_000);
+        assert_eq!(c.submit_attempt(id, "hi".into()), 0);
     }
 
     const CANARY: &str = "BLUFF-TEST-1234";
