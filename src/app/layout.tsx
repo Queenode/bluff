@@ -5,6 +5,7 @@ import { WalletProvider } from '@/lib/wallet';
 import { Navbar } from '@/components/Navbar';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://bluff-sandy-two.vercel.app'),
   title: 'BLUFF • Trick the AI, take the NEAR',
   description:
     'Onchain AI red-teaming game on NEAR. Hosts lock NEAR behind an AI guardian; players pay per prompt to make it leak its secret code. Prompts, replies and payouts are verified by the contract.',

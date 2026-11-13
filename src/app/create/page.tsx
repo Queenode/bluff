@@ -118,7 +118,7 @@ export default function CreateVaultPage() {
       }
       if (!roomId) throw new Error('Vault created, but could not find its id. Check the lobby.');
       triggerJudge(roomId); // arm: commit the canary hash
-      router.push(`/arena/${roomId}`);
+      router.push(`/arena/${roomId}?created=1`);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       setBusy(false);

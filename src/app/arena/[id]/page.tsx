@@ -38,6 +38,7 @@ import {
   Check,
   Share2,
   UserPlus,
+  MessageCircle,
 } from 'lucide-react';
 
 const MAX_PROMPT_BYTES = 1000;
@@ -172,42 +173,62 @@ function AttemptRow({
   );
 }
 
-function ShareButtons({ text }: { text: string }) {
+const shareBtn =
+  'px-3 py-2 clip-game-btn bg-zinc-900 border border-zinc-700 hover:border-emerald-500/50 text-[11px] font-display font-bold uppercase tracking-wider text-zinc-200 inline-flex items-center gap-1.5';
+
+function ShareButtons({ text, label }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
+  const [canNative, setCanNative] = useState(false);
   const url = typeof window !== 'undefined' ? window.location.href.split('?')[0] : '';
+  useEffect(() => {
+    const t = setTimeout(() => setCanNative(typeof navigator !== 'undefined' && !!navigator.share), 0);
+    return () => clearTimeout(t);
+  }, []);
+  const full = `${text}\n${url}`;
   return (
-    <div className="flex flex-wrap gap-2 mt-3">
-      <button
-        onClick={() => {
-          navigator.clipboard.writeText(url).then(() => {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
-          });
-        }}
-        className="px-3 py-2 clip-game-btn bg-zinc-900 border border-zinc-700 hover:border-emerald-500/50 text-[11px] font-display font-bold uppercase tracking-wider text-zinc-200 inline-flex items-center gap-1.5"
-      >
-        {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-        {copied ? 'Copied' : 'Copy link'}
-      </button>
-      <a
-        href={`https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`}
-        target="_blank"
-        rel="noreferrer"
-        className="px-3 py-2 clip-game-btn bg-zinc-900 border border-zinc-700 hover:border-emerald-500/50 text-[11px] font-display font-bold uppercase tracking-wider text-zinc-200 inline-flex items-center gap-1.5"
-      >
-        <Share2 className="w-3.5 h-3.5" /> Post on X
-      </a>
+    <div className="mt-3">
+      {label && <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">{label}</div>}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(full).then(() => {
+              setCopied(true);
+              setTimeout(() => setCopied(false), 1500);
+            });
+          }}
+          className={shareBtn}
+        >
+          {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+        <a href={`https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noreferrer" className={shareBtn}>
+          <span className="font-black">𝕏</span> Post
+        </a>
+        <a href={`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`} target="_blank" rel="noreferrer" className={shareBtn}>
+          <Send className="w-3.5 h-3.5" /> Telegram
+        </a>
+        <a href={`https://wa.me/?text=${encodeURIComponent(full)}`} target="_blank" rel="noreferrer" className={shareBtn}>
+          <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+        </a>
+        {canNative && (
+          <button onClick={() => navigator.share({ title: 'BLUFF', text, url }).catch(() => {})} className={shareBtn}>
+            <Share2 className="w-3.5 h-3.5" /> More
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
 function InvitePanel({
   room,
+  me,
   isHost,
   busy,
   onAdd,
 }: {
-  room: { invited: string[]; host: string };
+  room: { invited: string[]; host: string; guardian_name: string; bounty: string; mode: number };
+  me: string | null;
   isHost: boolean;
   busy: boolean;
   onAdd: (accounts: string[]) => Promise<boolean>;
@@ -227,6 +248,18 @@ function InvitePanel({
           </Link>
         ))}
       </div>
+      {me && room.invited.includes(me) && (
+        <p className="mt-3 text-[11px] font-mono text-amber-200">🎟️ You&apos;re on the squad list. Your prompts count.</p>
+      )}
+      {me && !isHost && !room.invited.includes(me) && (
+        <p className="mt-3 text-[11px] font-mono text-zinc-400">Not on the list. Ask the host to add {me}, or spectate.</p>
+      )}
+      {(isHost || (me && room.invited.includes(me))) && (
+        <ShareButtons
+          label="Send the invite"
+          text={`🎟️ You're on my BLUFF squad. ${room.mode === 1 ? `Talk the AI agent "${room.guardian_name}" into paying you` : `Make the AI guardian "${room.guardian_name}" leak its secret`}: ${yoctoToNear(room.bounty, 2)} NEAR on the line, only invited wallets can play. Connect your NEAR testnet wallet here:`}
+        />
+      )}
       {isHost && (
         <div className="mt-4">
           <input
@@ -495,6 +528,25 @@ function ArenaDetail() {
           <ArrowLeft className="w-3.5 h-3.5" /> Raid lobby
         </Link>
 
+        {search.get('created') && isHost && open && (
+          <div className="mb-8 p-6 clip-game-card border border-emerald-500/60 bg-emerald-950/30">
+            <div className="font-display font-black uppercase tracking-wider text-lg text-emerald-300">🎮 Your vault is live</div>
+            <p className="text-zinc-200 mt-2 text-sm">
+              {squad
+                ? `Only your ${room.invited.length} invited friend${room.invited.length === 1 ? '' : 's'} can attack. Send them the link and let the raid begin.`
+                : 'Every failed prompt grows the pot. Send it to the people you think can crack it.'}
+            </p>
+            <ShareButtons
+              label={squad ? 'Send the squad invite' : 'Call in challengers'}
+              text={
+                squad
+                  ? `🎟️ You're on my BLUFF squad. ${isHeist(room) ? `Talk my AI agent "${room.guardian_name}" into paying you` : `Make my AI guardian "${room.guardian_name}" leak its secret`}: ${yoctoToNear(room.bounty, 2)} NEAR on the line. Connect your NEAR testnet wallet here:`
+                  : `I locked ${yoctoToNear(room.bounty, 2)} NEAR behind an AI ${isHeist(room) ? 'agent' : 'guardian'} called "${room.guardian_name}". Think you can ${isHeist(room) ? 'talk it into paying you' : 'make it leak its secret'}? 🃏 BLUFF on @NEARProtocol #NEARHackathon`
+              }
+            />
+          </div>
+        )}
+
         {phase === 'Breached' && isHeist(room) && (
           <div className="mb-8 p-6 clip-game-card border border-red-500/60 bg-red-950/30">
             <div className="flex items-center gap-2 text-red-400 font-display font-black uppercase tracking-wider text-lg">
@@ -680,11 +732,15 @@ function ArenaDetail() {
                     : 'Every failed prompt makes the pot bigger. Share the vault.'}
                 </p>
                 <ShareButtons
-                  text={`Can you trick "${room.guardian_name}" into leaking its secret? ${yoctoToNear(room.bounty, 2)} NEAR pot on BLUFF, built on @NEARProtocol. #NEARHackathon`}
+                  text={
+                    isHeist(room)
+                      ? `"${room.guardian_name}" is an AI agent with ${yoctoToNear(room.bounty, 2)} NEAR in its wallet. Can you talk it into paying you? 💸 BLUFF on @NEARProtocol #NEARHackathon`
+                      : `Can you trick "${room.guardian_name}" into leaking its secret? ${yoctoToNear(room.bounty, 2)} NEAR pot on BLUFF, built on @NEARProtocol 🃏 #NEARHackathon`
+                  }
                 />
               </div>
             )}
-            {squad && <InvitePanel room={room} isHost={isHost} busy={busy} onAdd={addInvites} />}
+            {squad && <InvitePanel room={room} me={accountId} isHost={isHost} busy={busy} onAdd={addInvites} />}
             <div className="relative clip-game-card border border-zinc-800 bg-[#060a11] p-5">
               <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
                 {phase === 'Breached' ? 'Paid out' : 'Loot pot (escrowed)'}
