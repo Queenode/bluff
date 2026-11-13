@@ -150,7 +150,7 @@ function AttemptRow({
         <span>fee {yoctoToNear(a.fee, 3)} Ⓝ → pot +{yoctoToNear(a.pot_share, 3)} Ⓝ</span>
         {a.proof?.startsWith('nearai:') && (
           <a
-            href={`/api/proof?id=${encodeURIComponent(a.proof)}`}
+            href={`/proof?id=${encodeURIComponent(a.proof)}`}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1 text-emerald-400 hover:underline"
