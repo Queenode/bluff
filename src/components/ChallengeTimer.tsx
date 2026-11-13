@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Clock, AlertTriangle, CheckCircle, Skull } from 'lucide-react';
+import { Clock, AlertTriangle, Skull } from 'lucide-react';
 
 interface ChallengeTimerProps {
   expiresAt?: number;

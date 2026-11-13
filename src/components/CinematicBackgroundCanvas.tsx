@@ -38,7 +38,7 @@ export const CinematicBackgroundCanvas: React.FC = () => {
       });
     }
 
-    let mouse = { x: -1000, y: -1000 };
+    const mouse = { x: -1000, y: -1000 };
 
     const handleMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;

@@ -1,216 +1,110 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useNear } from '@/lib/nearContext';
 import { ArenaCard } from '@/components/ArenaCard';
-import {
-  Shield,
-  Users,
-  Building,
-  Globe,
-  Search,
-  Swords,
-  Crosshair
-} from 'lucide-react';
+import { api, roomPhase, yoctoToNear, CONTRACT_ID, accountUrl } from '@/lib/near';
+import { useChain, useNow } from '@/lib/useChain';
+import { Swords, Loader2, Plus, ExternalLink } from 'lucide-react';
 
-export default function ArenasDirectoryPage() {
-  const { rooms, activeFilter, setActiveFilter } = useNear();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'breached' | 'expired'>('all');
+const FILTERS = ['Live', 'Breached', 'Expired', 'All'] as const;
+type Filter = (typeof FILTERS)[number];
 
-  const filteredRooms = rooms.filter(room => {
-    const matchesCategory = activeFilter === 'all' || room.category === activeFilter;
-    const matchesStatus = statusFilter === 'all' || room.status === statusFilter;
-    const matchesSearch =
-      !searchQuery.trim() ||
-      room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      room.guardian.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      room.host.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      room.targetObjective.toLowerCase().includes(searchQuery.toLowerCase());
+export default function ArenasPage() {
+  const { data: rooms, error, loading } = useChain(() => api.rooms(0, 100), [], 10_000);
+  const now = useNow(10_000);
+  const [filter, setFilter] = useState<Filter>('Live');
 
-    return matchesCategory && matchesStatus && matchesSearch;
-  });
+  const filtered = useMemo(() => {
+    if (!rooms) return [];
+    const t = now ?? 0;
+    return rooms.filter(r => {
+      const p = roomPhase(r, t || Number(r.created_at));
+      if (filter === 'All') return true;
+      if (filter === 'Live') return p === 'Live' || p === 'Arming';
+      if (filter === 'Breached') return p === 'Breached';
+      return p === 'Expired' || p === 'Refunded';
+    });
+  }, [rooms, filter, now]);
 
-  const activeRoomsCount = rooms.filter(r => r.status === 'active').length;
-  const totalEscrow = rooms
-    .filter(r => r.status === 'active')
-    .reduce((sum, r) => sum + r.bounty, 0);
-  const totalAttempts = rooms.reduce((sum, r) => sum + r.attemptsCount, 0);
+  const livePot = useMemo(() => {
+    if (!rooms || now === null) return null;
+    return rooms
+      .filter(r => ['Live', 'Arming'].includes(roomPhase(r, now)))
+      .reduce((acc, r) => acc + BigInt(r.bounty), BigInt(0));
+  }, [rooms, now]);
 
   return (
-    <div className="min-h-screen bg-[#03060a] text-zinc-100 font-sans pb-24">
-      {/* Top Gaming Raid Lobby Header Banner */}
-      <div className="relative overflow-hidden border-b border-white/10 bg-[#050911] py-12 px-4">
-        <div className="absolute top-0 left-1/3 w-[500px] h-[220px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+    <div className="min-h-screen bg-[#03060a] px-4 py-12">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 clip-game-btn bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold uppercase tracking-[0.18em] mb-3">
-              <Crosshair className="w-3.5 h-3.5" />
-              <span>[ RAID LOBBY // SELECT YOUR TARGET ]</span>
+            <div className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-emerald-400 mb-2">
+              {'// '}RAID LOBBY • LIVE FROM{' '}
+              <a href={accountUrl(CONTRACT_ID)} target="_blank" rel="noreferrer" className="underline inline-flex items-center gap-1">
+                {CONTRACT_ID} <ExternalLink className="w-3 h-3" />
+              </a>
             </div>
             <h1 className="font-display text-3xl sm:text-4xl font-black uppercase tracking-wider text-white text-glow-white">
-              Active Boss Arenas
+              Choose Your Target
             </h1>
-            <p className="text-sm sm:text-base text-zinc-300 mt-2 max-w-2xl font-medium">
-              Pick an AI Boss below, spend NEAR per turn to fire prompt attacks, and trick the sentinel into leaking its secret keyphrase to loot 100% of the pot.
+            <p className="text-zinc-400 text-sm mt-2 max-w-xl">
+              Every vault below is a real onchain escrow. Pay the per-prompt fee, make the guardian say its secret code, and
+              the contract pays you the whole pot.
             </p>
           </div>
-
-          {/* Live Telemetry Summary HUD Pills */}
-          <div className="flex flex-wrap items-center gap-3 text-xs">
-            <div className="px-4 py-2.5 clip-game-card bg-zinc-950/90 border border-white/10">
-              <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">LIVE BOSSES</div>
-              <div className="font-display text-base font-black text-white mt-0.5">{activeRoomsCount} ARENAS</div>
-            </div>
-            <div className="px-4 py-2.5 clip-game-card bg-zinc-950/90 border border-white/10">
-              <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">TOTAL LOOT POOL</div>
-              <div className="font-display text-base font-black text-emerald-400 mt-0.5">{totalEscrow.toFixed(1)} NEAR</div>
-            </div>
-            <div className="px-4 py-2.5 clip-game-card bg-zinc-950/90 border border-white/10">
-              <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">ATTACKS FIRED</div>
-              <div className="font-display text-base font-black text-zinc-200 mt-0.5">{totalAttempts}</div>
-            </div>
+          <div className="flex items-center gap-4">
+            {livePot !== null && (
+              <div className="text-right">
+                <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Up for grabs</div>
+                <div className="font-display text-2xl font-black text-white">
+                  {yoctoToNear(livePot, 2)} <span className="text-emerald-400 text-sm">NEAR</span>
+                </div>
+              </div>
+            )}
             <Link
               href="/create"
-              className="px-5 py-3.5 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-display font-black text-xs uppercase tracking-[0.12em] inline-flex items-center gap-1.5 transition-all shadow-[0_0_25px_rgba(16,185,129,0.35)]"
+              className="px-5 py-3 clip-game-btn bg-emerald-500 hover:bg-emerald-400 text-[#03060a] font-display font-black text-xs uppercase tracking-wider inline-flex items-center gap-2"
             >
-              <Swords className="w-4 h-4" />
-              <span>[ HOST MATCH ]</span>
+              <Plus className="w-4 h-4" /> Host a vault
             </Link>
           </div>
         </div>
-      </div>
 
-      {/* Filter & Search Bar */}
-      <div className="max-w-7xl mx-auto px-4 pt-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3 rounded-xl bg-zinc-950/90 border border-zinc-800/80 mb-8">
-          {/* Category Filter Tabs */}
-          <div className="flex flex-wrap items-center gap-2 font-display text-xs">
+        <div className="flex flex-wrap gap-2 mb-8">
+          {FILTERS.map(f => (
             <button
-              onClick={() => setActiveFilter('all')}
-              className={`px-3.5 py-2 clip-game-btn uppercase tracking-wider transition-all ${
-                activeFilter === 'all'
-                  ? 'bg-emerald-500 text-[#03060a] font-black'
-                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900 font-bold'
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-4 py-2 clip-game-btn text-[11px] font-display font-bold uppercase tracking-wider border transition-colors ${
+                filter === f
+                  ? 'bg-emerald-500 text-[#03060a] border-emerald-400'
+                  : 'bg-zinc-900/80 text-zinc-300 border-zinc-800 hover:border-emerald-500/40'
               }`}
             >
-              All Arenas ({rooms.length})
+              {f}
             </button>
-
-            <button
-              onClick={() => setActiveFilter('squad')}
-              className={`px-3.5 py-2 clip-game-btn uppercase tracking-wider flex items-center gap-1.5 transition-all ${
-                activeFilter === 'squad'
-                  ? 'bg-emerald-500 text-[#03060a] font-black'
-                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900 font-bold'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>Squad Deathmatch</span>
-            </button>
-
-            <button
-              onClick={() => setActiveFilter('enterprise')}
-              className={`px-3.5 py-2 clip-game-btn uppercase tracking-wider flex items-center gap-1.5 transition-all ${
-                activeFilter === 'enterprise'
-                  ? 'bg-emerald-500 text-[#03060a] font-black'
-                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900 font-bold'
-              }`}
-            >
-              <Building className="w-3.5 h-3.5" />
-              <span>Protocol Bounties</span>
-            </button>
-
-            <button
-              onClick={() => setActiveFilter('global')}
-              className={`px-3.5 py-2 clip-game-btn uppercase tracking-wider flex items-center gap-1.5 transition-all ${
-                activeFilter === 'global'
-                  ? 'bg-emerald-500 text-[#03060a] font-black'
-                  : 'bg-zinc-900/70 text-zinc-400 hover:text-white hover:bg-zinc-900 font-bold'
-              }`}
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>Global Raid Bosses</span>
-            </button>
-          </div>
-
-          {/* Search & Status Filter */}
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 sm:w-64">
-              <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search boss, host, objective..."
-                className="w-full rounded-lg bg-zinc-900 border border-zinc-800 pl-9 pr-3 py-2 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/60"
-              />
-            </div>
-
-            <div className="flex items-center gap-1 p-1 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] font-display uppercase">
-              <button
-                onClick={() => setStatusFilter('all')}
-                className={`px-2.5 py-1 rounded transition-colors ${
-                  statusFilter === 'all' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setStatusFilter('active')}
-                className={`px-2.5 py-1 rounded transition-colors ${
-                  statusFilter === 'active' ? 'bg-zinc-800 text-emerald-400 font-bold' : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                Alive
-              </button>
-              <button
-                onClick={() => setStatusFilter('breached')}
-                className={`px-2.5 py-1 rounded transition-colors ${
-                  statusFilter === 'breached' ? 'bg-zinc-800 text-red-400 font-bold' : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                Slain
-              </button>
-              <button
-                onClick={() => setStatusFilter('expired')}
-                className={`px-2.5 py-1 rounded transition-colors ${
-                  statusFilter === 'expired' ? 'bg-zinc-800 text-amber-400 font-bold' : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                Expired
-              </button>
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Arenas Grid */}
-        {filteredRooms.length === 0 ? (
-          <div className="text-center py-20 clip-game-card bg-zinc-950/60 border border-zinc-800/80">
-            <Shield className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-            <h3 className="text-base font-bold font-display uppercase tracking-wider text-white">
-              No Matching Boss Arenas
-            </h3>
-            <p className="text-xs text-zinc-500 mt-1 mb-5">
-              Try resetting your filters or host a new Squad Deathmatch.
-            </p>
-            <button
-              onClick={() => {
-                setActiveFilter('all');
-                setStatusFilter('all');
-                setSearchQuery('');
-              }}
-              className="px-4 py-2 clip-game-btn bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-display font-bold uppercase text-zinc-200"
-            >
-              [ RESET FILTERS ]
-            </button>
+        {loading && !rooms ? (
+          <div className="flex items-center justify-center py-24 text-zinc-400 font-mono text-sm gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" /> Reading vaults from NEAR…
+          </div>
+        ) : error && !rooms ? (
+          <div className="py-16 text-center text-red-400 font-mono text-sm">Could not reach NEAR RPC: {error}</div>
+        ) : filtered.length === 0 ? (
+          <div className="py-20 text-center clip-game-card border border-zinc-800 bg-[#060a11]">
+            <Swords className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
+            <p className="text-zinc-300 font-display uppercase tracking-wider">No {filter === 'All' ? '' : filter.toLowerCase()} vaults right now</p>
+            <Link href="/create" className="inline-block mt-4 text-emerald-400 underline font-mono text-sm">
+              Be the first to host one →
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredRooms.map(room => (
-              <ArenaCard key={room.id} room={room} />
+            {filtered.map(r => (
+              <ArenaCard key={r.id} room={r} />
             ))}
           </div>
         )}

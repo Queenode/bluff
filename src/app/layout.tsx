@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import './globals.css';
-import { NearProvider } from '@/lib/nearContext';
+import { WalletProvider } from '@/lib/wallet';
 import { Navbar } from '@/components/Navbar';
 
 export const metadata: Metadata = {
-  title: 'BLUFF • PvP AI Boss Arena & Vault Game on NEAR',
+  title: 'BLUFF • Trick the AI, take the NEAR',
   description:
-    'Outsmart autonomous AI Bosses guarding real NEAR vaults. Play Squad Deathmatch with friends, raid Global Jackpot Bosses, or hunt Protocol Bug Bounties.',
+    'Onchain AI red-teaming game on NEAR. Hosts lock NEAR behind an AI guardian; players pay per prompt to make it leak its secret code. Prompts, replies and payouts are verified by the contract.',
 };
 
 export default function RootLayout({
@@ -26,12 +26,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#03060a] text-zinc-100 font-sans selection:bg-emerald-500 selection:text-black">
-        <NearProvider>
+        <WalletProvider>
           <Suspense fallback={null}>
             <Navbar />
           </Suspense>
           <main className="flex-1">{children}</main>
-        </NearProvider>
+        </WalletProvider>
       </body>
     </html>
   );

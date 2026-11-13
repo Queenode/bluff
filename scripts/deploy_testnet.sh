@@ -1,35 +1,30 @@
 #!/usr/bin/env bash
-set -e
+# Build the BLUFF contract and deploy it to a fresh (or existing) testnet account.
+# Requires: near-cli-rs (`npm i -g near-cli-rs`), cargo-near (`cargo install cargo-near`).
+#
+#   ./scripts/deploy_testnet.sh <contract-account.testnet> <oracle-account.testnet>
+set -euo pipefail
 
-# ==============================================================================
-# BLUFF Escrow Smart Contract - NEAR Testnet Deployment Script
-# ==============================================================================
+CONTRACT=${1:?usage: deploy_testnet.sh <contract.testnet> <oracle.testnet>}
+ORACLE=${2:?usage: deploy_testnet.sh <contract.testnet> <oracle.testnet>}
 
-CONTRACT_NAME=${1:-"bluff-escrow.testnet"}
-WASM_PATH="./contracts/bluff_escrow.wasm"
+(cd contracts/bluff_escrow && cargo test && cargo near build non-reproducible-wasm)
+cp contracts/bluff_escrow/target/near/bluff_escrow.wasm contracts/bluff_escrow.wasm
 
-echo "========================================================"
-echo "🎯 Deploying BLUFF Escrow to NEAR Testnet: $CONTRACT_NAME"
-echo "========================================================"
+for acct in "$CONTRACT" "$ORACLE"; do
+  if ! near account view-account-summary "$acct" network-config testnet now >/dev/null 2>&1; then
+    near account create-account sponsor-by-faucet-service "$acct" autogenerate-new-keypair \
+      save-to-legacy-keychain network-config testnet create
+  fi
+done
 
-if [ ! -f "$WASM_PATH" ]; then
-    echo "⚠️ WASM not found at $WASM_PATH, building release..."
-    cd contracts/bluff_escrow
-    cargo build --target wasm32-unknown-unknown --release
-    cp target/wasm32-unknown-unknown/release/bluff_escrow.wasm ../bluff_escrow.wasm
-    cd ../..
-fi
+near contract deploy "$CONTRACT" use-file contracts/bluff_escrow.wasm \
+  with-init-call new json-args "{\"owner_id\":\"$CONTRACT\",\"oracle_id\":\"$ORACLE\"}" \
+  prepaid-gas '30 Tgas' attached-deposit '0 NEAR' \
+  network-config testnet sign-with-legacy-keychain send
 
-echo "📦 WASM binary verified: $(ls -lh $WASM_PATH | awk '{print $5}')"
-
-# Check if near CLI is installed
-if command -v near &> /dev/null; then
-    echo "🚀 Deploying with near-cli..."
-    near deploy "$CONTRACT_NAME" "$WASM_PATH" --initFunction new --initArgs "{\"owner_id\": \"$CONTRACT_NAME\"}"
-    echo "✅ Contract deployed & initialized successfully!"
-else
-    echo "ℹ️ Note: Install 'near-cli' (npm i -g near-cli) or 'cargo-near' to deploy from terminal."
-    echo "Command to run:"
-    echo "near deploy $CONTRACT_NAME $WASM_PATH --initFunction new --initArgs '{\"owner_id\": \"'$CONTRACT_NAME'\"}'"
-fi
-
+echo
+echo "Deployed. Put these in .env.local:"
+echo "NEXT_PUBLIC_CONTRACT_ID=$CONTRACT"
+echo "ORACLE_ACCOUNT_ID=$ORACLE"
+echo "ORACLE_PRIVATE_KEY=$(python3 -c "import json,os;print(json.load(open(os.path.expanduser('~/.near-credentials/testnet/$ORACLE.json')))['private_key'])")"

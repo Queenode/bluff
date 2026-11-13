@@ -1,15 +1,18 @@
 [package]
 name = "bluff_escrow"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+repository = "https://github.com/Rampop01/bluff"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-near-sdk = "5.7.0"
-borsh = "1.5"
+near-sdk = "5.29.1"
 hex = "0.4.3"
+
+[dev-dependencies]
+near-sdk = { version = "5.29.1", features = ["unit-testing"] }
 
 [profile.release]
 codegen-units = 1
