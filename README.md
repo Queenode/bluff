@@ -8,7 +8,7 @@ Built for **NEAR HACKATHON 2026**. Tracks: **AI Security & Defense**, **Games Wi
 
 | | |
 |---|---|
-| Live app | _see the submission post; or run locally in 2 minutes (below)_ |
+| Live app | **https://bluff-sandy-two.vercel.app** (NEAR testnet) |
 | Contract (testnet) | [`bluff-vault-76371.testnet`](https://testnet.nearblocks.io/address/bluff-vault-76371.testnet) |
 | Judge / oracle account | [`bluff-oracle-76371.testnet`](https://testnet.nearblocks.io/address/bluff-oracle-76371.testnet) |
 | Guardian model | `Qwen/Qwen3.6-35B-A3B-FP8` on **NEAR AI Cloud** (TEE, signed responses) |
