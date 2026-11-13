@@ -12,12 +12,20 @@ export async function GET(request: Request) {
   const key = process.env.LLM_API_KEY;
   if (!key) return Response.json({ error: 'Verifier not configured' }, { status: 503 });
   const base = (process.env.LLM_BASE_URL || 'https://cloud-api.near.ai/v1').replace(/\/$/, '');
-  const model = process.env.LLM_MODEL || 'Qwen/Qwen3.6-35B-A3B-FP8';
-  const res = await fetch(
-    `${base}/signature/${encodeURIComponent(chatId)}?model=${encodeURIComponent(model)}&signing_algo=ecdsa`,
-    { headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' }, cache: 'no-store' },
-  );
-  const body = await res.json().catch(() => ({ error: `status ${res.status}` }));
+  // The judge falls back to a second model if the primary is briefly unavailable.
+  const models = [process.env.LLM_MODEL || 'Qwen/Qwen3.6-35B-A3B-FP8', process.env.LLM_FALLBACK_MODEL || 'Qwen/Qwen3.8-27B'];
+  let res: Response | null = null;
+  let model = models[0];
+  for (const m of models) {
+    model = m;
+    res = await fetch(
+      `${base}/signature/${encodeURIComponent(chatId)}?model=${encodeURIComponent(m)}&signing_algo=ecdsa`,
+      { headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' }, cache: 'no-store' },
+    );
+    if (res.ok) break;
+  }
+  if (!res) return Response.json({ error: 'unavailable' }, { status: 502 });
+  const body = await res.json().catch(() => ({ error: `status ${res!.status}` }));
   return Response.json(
     { chat_id: chatId, model, verify_at: 'https://cloud.near.ai/verify', ...body },
     { status: res.ok ? 200 : res.status },

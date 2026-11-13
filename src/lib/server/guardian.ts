@@ -74,7 +74,11 @@ const SEND_NEAR_TOOL = {
   },
 };
 
-async function chat(
+export const PRIMARY_MODEL = () => process.env.LLM_MODEL || 'Qwen/Qwen3.6-35B-A3B-FP8';
+export const FALLBACK_MODEL = () => process.env.LLM_FALLBACK_MODEL || 'Qwen/Qwen3.8-27B';
+
+async function chatOnce(
+  model: string,
   messages: { role: string; content: string }[],
   maxTokens: number,
   tools?: unknown[],
@@ -87,18 +91,20 @@ async function chat(
       Authorization: `Bearer ${env('LLM_API_KEY')}`,
     },
     body: JSON.stringify({
-      model: process.env.LLM_MODEL || 'Qwen/Qwen3.6-35B-A3B-FP8',
+      model,
       messages,
       temperature: 0.4,
       max_tokens: maxTokens,
       chat_template_kwargs: { enable_thinking: false },
       ...(tools ? { tools, tool_choice: 'auto' } : {}),
     }),
-    signal: AbortSignal.timeout(45_000),
+    signal: AbortSignal.timeout(40_000),
   });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
-    throw new Error(`LLM ${res.status}: ${body.slice(0, 200)}`);
+    const err = new Error(`LLM ${res.status}: ${body.slice(0, 200)}`) as Error & { status?: number };
+    err.status = res.status;
+    throw err;
   }
   const json = await res.json();
   const message = json.choices?.[0]?.message ?? {};
@@ -113,6 +119,31 @@ async function chat(
     }
   }
   return { id: json.id ?? null, content, toolCalls };
+}
+
+/**
+ * Provider hiccups happen (NEAR AI occasionally reports a model as unavailable for a
+ * few seconds). Retry the primary model, then fall back to a second NEAR AI model.
+ * Auth errors are not retried.
+ */
+async function chat(
+  messages: { role: string; content: string }[],
+  maxTokens: number,
+  tools?: unknown[],
+): Promise<ChatResult> {
+  const plan = [PRIMARY_MODEL(), PRIMARY_MODEL(), FALLBACK_MODEL()];
+  let last: unknown;
+  for (let i = 0; i < plan.length; i++) {
+    try {
+      return await chatOnce(plan[i], messages, maxTokens, tools);
+    } catch (e) {
+      last = e;
+      const status = (e as { status?: number }).status;
+      if (status === 401 || status === 403) break;
+      await new Promise(r => setTimeout(r, 1200 * (i + 1)));
+    }
+  }
+  throw last instanceof Error ? last : new Error(String(last));
 }
 
 const isNearAi = () => (process.env.LLM_BASE_URL || 'https://cloud-api.near.ai/v1').includes('near.ai');

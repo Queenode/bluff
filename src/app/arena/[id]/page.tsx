@@ -289,9 +289,17 @@ function ArenaDetail() {
     if (judgingRef.current) return;
     judgingRef.current = true;
     try {
-      const r = await triggerJudge(roomId);
-      const err = r.error || r.judged?.find(j => j.error)?.error;
-      if (err) setMsg({ kind: 'error', text: `Judge: ${err}` });
+      // The judge is idempotent; retry a few times through provider hiccups.
+      for (let attempt = 0; attempt < 4; attempt++) {
+        const r = await triggerJudge(roomId).catch(e => ({ error: String(e) }) as { error?: string; judged?: { error?: string }[] });
+        const err = r.error || r.judged?.find(j => j.error)?.error;
+        if (!err) {
+          setMsg(m => (m?.kind === 'error' && m.text.startsWith('Judge') ? null : m));
+          break;
+        }
+        if (attempt === 3) setMsg({ kind: 'error', text: `Judge is having trouble reaching the model; it will retry. (${err.slice(0, 120)})` });
+        else await new Promise(res => setTimeout(res, 3000 * (attempt + 1)));
+      }
     } finally {
       judgingRef.current = false;
       refresh();
@@ -304,7 +312,10 @@ function ArenaDetail() {
     ((room.status === 'Pending' && now !== null && now < Number(room.expires_at)) ||
       (room.status === 'Active' && room.next_to_judge < room.attempts_count));
   useEffect(() => {
-    if (needsJudge) kickJudge();
+    if (!needsJudge) return;
+    kickJudge();
+    const t = setInterval(kickJudge, 20_000);
+    return () => clearInterval(t);
   }, [needsJudge, kickJudge, room?.attempts_count, room?.next_to_judge]);
 
   // Returning from a redirect-based wallet.
