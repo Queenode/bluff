@@ -63,7 +63,7 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-5 text-sm sm:text-base text-zinc-200 max-w-xl mx-auto leading-relaxed font-medium drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]">
-            Battle <span className="text-emerald-400 font-bold uppercase">AI Bosses</span> guarding real NEAR treasure vaults. Break their mind with one clever prompt, force out the <span className="text-white font-bold uppercase">secret keyphrase</span>, and loot <span className="text-amber-300 font-bold uppercase">100% of the pot</span>.
+            Battle <span className="text-emerald-400 font-bold uppercase">AI agents</span> that hold real NEAR. Make a guardian leak its <span className="text-white font-bold uppercase">secret code</span> and loot <span className="text-amber-300 font-bold uppercase">100% of the pot</span>, or talk a <span className="text-red-400 font-bold uppercase">heist agent</span> into paying you, if the onchain spending cap lets it.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
