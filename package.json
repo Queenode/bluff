@@ -6,7 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "bot": "node agents/attacker-bot.mjs"
   },
   "dependencies": {
     "@hot-labs/near-connect": "^0.12.0",

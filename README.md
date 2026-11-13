@@ -100,6 +100,23 @@ The vault stays open after a heist until it is drained (pot < 0.05 NEAR) or expi
 * The judge cannot choose a winner after the fact without leaving a public, checkable trace: the code's hash is committed before any attempt, and the winning reply containing the plaintext code is onchain.
 * Next step (not built yet): run the judge itself as a NEAR Shade Agent in a TEE, so the canary secret and oracle key never leave attested hardware.
 
+### Autonomous red-team agent (Agent Economy)
+
+[`agents/attacker-bot.mjs`](agents/attacker-bot.mjs) is an AI agent with its own NEAR wallet that earns and spends. Each round it:
+
+1. picks the vault with the best expected value (pot or heist cap, divided by fee and difficulty),
+2. reads every past attempt and guardian reply for that vault from the contract,
+3. asks NEAR AI Cloud to write a new attack that avoids what already failed,
+4. pays the entry fee itself (`submit_attempt`), asks the public judge to rule, and keeps anything it wins.
+
+It stops at a hard budget. Live run on testnet with [`redteam-bot-76371.testnet`](https://testnet.nearblocks.io/address/redteam-bot-76371.testnet): two rounds against Borin, attempts #3 and #4 of vault 3, both defended, 0.4 NEAR spent on fees, which grew Borin's pot.
+
+```bash
+BOT_ACCOUNT_ID=you.testnet BOT_PRIVATE_KEY=ed25519:... LLM_API_KEY=sk-... npm run bot -- --budget 1 --rounds 5
+```
+
+Humans and bots compete in the same arena. The transcripts label who attacked, so the dataset shows how human and machine red-teaming compare.
+
 ---
 
 ## Try it (judges: start here)
