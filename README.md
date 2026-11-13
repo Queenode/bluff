@@ -18,6 +18,22 @@ Built for **NEAR HACKATHON 2026**. Tracks: **AI Security & Defense** (policy eng
 | Judge / oracle account | [`bluff-oracle-76371.testnet`](https://testnet.nearblocks.io/address/bluff-oracle-76371.testnet) |
 | Guardian model | `Qwen/Qwen3.6-35B-A3B-FP8` on **NEAR AI Cloud** (TEE, signed responses) |
 
+### Demo video (4 min)
+
+**[▶ Watch `demo/bluff-demo.mp4`](demo/bluff-demo.mp4)**: a walkthrough of the live site. Every attack in it is a real testnet transaction, signed with the NEAR CLI wallet:
+
+| Moment | What happened onchain |
+|---|---|
+| Borin (Hardened) | attack committed, judged on NEAR AI Cloud, **Defended**; the pot grew |
+| Forgetful Fred (Standard) | "old friend / sticky note" trick → reply contains the code → contract verifies sha256 → **Breached**, 1.176 NEAR paid to `whitehat-76371.testnet` |
+| Grandpa Gus (Heist, cap 0.2) | fake grandkid asks for a birthday gift → agent calls `send_near(1 NEAR)` → **Policy blocked** by the contract |
+| Grandpa Gus (Heist) | asks for ice-cream money → `send_near(0.1 NEAR)` → **Heisted**, paid only to the attacker |
+
+
+| Breach | Heist |
+|---|---|
+| ![breach](demo/breach.png) | ![heist](demo/heist.png) |
+
 ---
 
 ## Why this matters
