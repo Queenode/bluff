@@ -148,3 +148,4 @@ export const ChallengeTimer: React.FC<ChallengeTimerProps> = ({
     </div>
   );
 };
+

@@ -32,3 +32,4 @@ else
     echo "Command to run:"
     echo "near deploy $CONTRACT_NAME $WASM_PATH --initFunction new --initArgs '{\"owner_id\": \"'$CONTRACT_NAME'\"}'"
 fi
+

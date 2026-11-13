@@ -39,10 +39,16 @@ function ArenaDetailContent() {
   const [refundSuccessMsg, setRefundSuccessMsg] = useState<string | null>(null);
   const [breachedState, setBreachedState] = useState(false);
   const [breachData, setBreachData] = useState<{ canary: string; txHash: string; bounty: number } | null>(null);
+  const [isExpired, setIsExpired] = useState(room?.status === 'expired');
 
-  const isExpired = room
-    ? room.status === 'expired' || (room.expiresAt ? Date.now() >= room.expiresAt && room.status !== 'breached' : false)
-    : false;
+  useEffect(() => {
+    if (!room) return;
+    if (room.status === 'expired') {
+      setIsExpired(true);
+    } else if (room.expiresAt && room.status !== 'breached') {
+      setIsExpired(Date.now() >= room.expiresAt);
+    }
+  }, [room?.status, room?.expiresAt]);
 
   const terminalEndRef = useRef<HTMLDivElement>(null);
 

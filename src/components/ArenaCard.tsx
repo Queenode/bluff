@@ -12,7 +12,15 @@ interface ArenaCardProps {
 
 export const ArenaCard: React.FC<ArenaCardProps> = ({ room }) => {
   const isBreached = room.status === 'breached';
-  const isExpired = room.status === 'expired' || (room.expiresAt ? Date.now() >= room.expiresAt && !isBreached : false);
+  const [isExpired, setIsExpired] = React.useState(room.status === 'expired');
+
+  React.useEffect(() => {
+    if (room.status === 'expired') {
+      setIsExpired(true);
+    } else if (room.expiresAt && !isBreached) {
+      setIsExpired(Date.now() >= room.expiresAt);
+    }
+  }, [room.status, room.expiresAt, isBreached]);
 
   const getDifficultyLevel = (diff: string) => {
     switch (diff) {
