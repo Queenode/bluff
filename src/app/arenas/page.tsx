@@ -52,7 +52,7 @@ export default function ArenasPage() {
               Choose Your Target
             </h1>
             <p className="text-zinc-400 text-sm mt-2 max-w-xl">
-              Every vault below is a real onchain escrow. Pay the per-prompt fee, make the guardian say its secret code, and
+              Every vault below is an onchain escrow. Pay the per-prompt fee, make the guardian say its secret code, and
               the contract pays you the whole pot.
             </p>
           </div>

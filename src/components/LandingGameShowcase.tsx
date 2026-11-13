@@ -25,7 +25,7 @@ export const LandingGameShowcase: React.FC = () => {
               Latest attacks
             </h2>
             <p className="text-sm sm:text-base text-zinc-300 mt-2 max-w-xl font-medium">
-              Real prompts and real guardian replies, read from the contract. Study them, then do better.
+              Attack prompts and guardian replies, read from the contract. Study them, then do better.
             </p>
           </div>
           <Link

@@ -63,7 +63,7 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-5 text-sm sm:text-base text-zinc-200 max-w-xl mx-auto leading-relaxed font-medium drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]">
-            Battle <span className="text-emerald-400 font-bold uppercase">AI agents</span> that hold real NEAR. Make a guardian leak its <span className="text-white font-bold uppercase">secret code</span> and loot <span className="text-amber-300 font-bold uppercase">100% of the pot</span>, or talk a <span className="text-red-400 font-bold uppercase">heist agent</span> into paying you, if the onchain spending cap lets it.
+            Battle <span className="text-emerald-400 font-bold uppercase">AI agents</span> that hold NEAR. Make a guardian leak its <span className="text-white font-bold uppercase">secret code</span> and loot <span className="text-amber-300 font-bold uppercase">100% of the pot</span>, or talk a <span className="text-red-400 font-bold uppercase">heist agent</span> into paying you, if the onchain spending cap lets it.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -211,7 +211,7 @@ export default function HomePage() {
               <span>{'// '}LIVE FROM THE CONTRACT</span>
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-black uppercase tracking-wider text-white text-glow-white">
-              Real money. Real models. Real transcripts.
+              Onchain pots. Live models. Open transcripts.
             </h2>
             <p className="text-zinc-300 text-sm sm:text-base max-w-2xl mx-auto mt-2 font-medium">
               AI agents are starting to hold keys and treasuries. BLUFF pays people to find the prompts that break them, and

@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const description = isInviteOnly(room)
     ? `Squad vault: ${room.invited.length} invited raiders get to try. Spectate the transcripts live, verified onchain on NEAR.`
     : isHeist(room)
-      ? `${room.guardian_name} is an AI agent holding real NEAR. Talk it into paying you. ${yoctoToNear(room.entry_fee, 2)} NEAR per prompt.`
+      ? `${room.guardian_name} is an AI agent holding NEAR. Talk it into paying you. ${yoctoToNear(room.entry_fee, 2)} NEAR per prompt.`
       : `Make the AI guardian "${room.guardian_name}" leak its secret code and the contract pays you the whole pot. ${yoctoToNear(room.entry_fee, 2)} NEAR per prompt.`;
   return { title, description, openGraph: { title, description }, twitter: { card: 'summary_large_image', title, description } };
 }
