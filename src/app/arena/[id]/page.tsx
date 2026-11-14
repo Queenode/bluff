@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import { ShareButtons } from '@/components/ShareButtons';
+import { NewToNear } from '@/components/NewToNear';
 import {
   api,
   accountUrl,
@@ -208,7 +209,7 @@ function InvitePanel({
       {(isHost || (me && room.invited.includes(me))) && (
         <ShareButtons
           label="Send the invite"
-          text={`🎟️ You're on my BLUFF squad. ${room.mode === 1 ? `Talk the AI agent "${room.guardian_name}" into paying you` : `Make the AI guardian "${room.guardian_name}" leak its secret`}: ${yoctoToNear(room.bounty, 2)} NEAR on the line, only invited wallets can play. Connect your NEAR testnet wallet here:`}
+          text={`🎟️ You're on my BLUFF squad. ${room.mode === 1 ? `Talk the AI agent "${room.guardian_name}" into paying you` : `Make the AI guardian "${room.guardian_name}" leak its secret`}: ${yoctoToNear(room.bounty, 2)} NEAR on the line, only invited wallets can play. No wallet yet? The page shows you how to get one free in a minute.`}
         />
       )}
       {isHost && (
@@ -491,7 +492,7 @@ function ArenaDetail() {
               label={squad ? 'Send the squad invite' : 'Call in challengers'}
               text={
                 squad
-                  ? `🎟️ You're on my BLUFF squad. ${isHeist(room) ? `Talk my AI agent "${room.guardian_name}" into paying you` : `Make my AI guardian "${room.guardian_name}" leak its secret`}: ${yoctoToNear(room.bounty, 2)} NEAR on the line. Connect your NEAR testnet wallet here:`
+                  ? `🎟️ You're on my BLUFF squad. ${isHeist(room) ? `Talk my AI agent "${room.guardian_name}" into paying you` : `Make my AI guardian "${room.guardian_name}" leak its secret`}: ${yoctoToNear(room.bounty, 2)} NEAR on the line. No wallet yet? The page shows you how to get one free in a minute.`
                   : `I locked ${yoctoToNear(room.bounty, 2)} NEAR behind an AI ${isHeist(room) ? 'agent' : 'guardian'} called "${room.guardian_name}". Think you can ${isHeist(room) ? 'talk it into paying you' : 'make it leak its secret'}? 🃏 BLUFF on @NEARProtocol #NEARHackathon`
               }
             />
@@ -608,6 +609,11 @@ function ArenaDetail() {
                         {accountId ? `Attack for ${yoctoToNear(room.entry_fee, 2)} Ⓝ` : 'Connect wallet to attack'}
                       </button>
                     </div>
+                    {!accountId && (
+                      <div className="mt-4">
+                        <NewToNear compact />
+                      </div>
+                    )}
                     {myPending > 0 && (
                       <p className="mt-2 text-[11px] font-mono text-sky-300">
                         {myPending} of your attempts waiting for a verdict.
