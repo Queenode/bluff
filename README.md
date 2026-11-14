@@ -344,7 +344,7 @@ Every judged reply stores its NEAR AI Cloud completion id. **`/proof?id=nearai:<
 | Someone fakes an event scoreboard | Boards only count vaults whose onchain `host` is the organiser, and scores are recomputed from contract data on every load. |
 | Operator runs off with the pots | Funds are held by the contract. The judge's key is a **function-call access key** limited to `arm_room`/`judge_attempt`: NEAR rejects transfers, other methods and other contracts ([log](demo/oracle-key-check.log)). The owner can only withdraw the treasury (the non-pot fee share). |
 
-**Honest residual trust:** the judge server holds the canary secret and the oracle key. It could leak a code or refuse to judge, though not without leaving public traces. The next step (see roadmap) is running the judge as a NEAR Shade Agent inside a TEE so those keys never leave attested hardware.
+**Remaining trust:** the judge server holds the canary secret and the oracle key. It could leak a code or refuse to judge, though not without leaving public traces. The next step (see roadmap) is running the judge as a NEAR Shade Agent inside a TEE so those keys never leave attested hardware.
 
 ---
 
