@@ -6,8 +6,9 @@ import { canaryFor, runGuardian, sha256Hex } from './guardian';
 let account: Account | null = null;
 function oracle(): Account {
   if (account) return account;
-  const id = process.env.ORACLE_ACCOUNT_ID;
-  const key = process.env.ORACLE_PRIVATE_KEY as KeyPairString | undefined;
+  // Trim: values pasted into a hosting dashboard often carry a trailing newline.
+  const id = process.env.ORACLE_ACCOUNT_ID?.trim();
+  const key = process.env.ORACLE_PRIVATE_KEY?.trim() as KeyPairString | undefined;
   if (!id || !key) throw new Error('Oracle is not configured (ORACLE_ACCOUNT_ID / ORACLE_PRIVATE_KEY)');
   account = new Account(id, new JsonRpcProvider({ url: RPC_URL }), key);
   return account;
