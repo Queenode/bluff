@@ -7,7 +7,7 @@ AI guardians sit on real NEAR pots. Talk one into leaking its secret code, or (i
 | | |
 |---|---|
 | ▶ **Play it** | **https://bluff-sandy-two.vercel.app** (NEAR testnet) |
-| 🎬 **Demo video** | [`demo/bluff-demo.mp4`](demo/bluff-demo.mp4) (4:07) |
+| 🎬 **Demo video** | [`demo/bluff-demo.mp4`](demo/bluff-demo.mp4) (4:07, full walkthrough) · [`demo/bluff-demo-x.mp4`](demo/bluff-demo-x.mp4) (2:08 cut for X) |
 | 📜 **Contract** | [`bluff-live-76371.testnet`](https://testnet.nearblocks.io/address/bluff-live-76371.testnet) |
 | ⚖️ **Judge / oracle** | [`bluff-oracle-76371.testnet`](https://testnet.nearblocks.io/address/bluff-oracle-76371.testnet) |
 | 🧠 **Guardian model** | `Qwen/Qwen3.6-35B-A3B-FP8` on **NEAR AI Cloud** (runs in a TEE; every reply has a signed proof) |
