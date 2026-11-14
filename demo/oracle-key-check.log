@@ -1,0 +1,6 @@
+judge account : bluff-oracle-76371.testnet
+signing key   : ed25519:B8kd5GoKnppyhaeJ5LpaGoaHqvQdrg8JmNYBCVqh6LpF
+permission    : {"FunctionCall":{"allowance":"1999576741004995000000000","method_names":["arm_room","judge_attempt"],"receiver_id":"bluff-live-76371.testnet"}}
+✓ transfer 0.01 NEAR to an attacker: rejected (Access key requires full access)
+✓ call withdraw_treasury on BLUFF: rejected (Access key does not allow method withdraw_treasury)
+✓ call a method on another contract: rejected (Access key receiver bluff-live-76371.testnet does not match transaction receiver wrap.testnet)

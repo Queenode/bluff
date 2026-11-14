@@ -73,7 +73,7 @@ The organisers' track hints are optional (HACKATHON.md, Q-011). This table maps 
 
 | Track | Track hints | In BLUFF |
 |---|---|---|
-| **AI Security & Defense** (`security`) | spending limits, policy engines, sandboxed wallets, TEE attestation, function-call keys | Heist mode is an onchain **policy engine** for an AI wallet: fixed recipient, per-transfer cap, `PolicyBlocked` log ([evidence tx](https://testnet.nearblocks.io/txns/GatHh7buwyytwuBEZZif6mc1ZWXqVK3uY3u6e96p5XJX)). Prompt-injection attempts are stored onchain and judged in order. Every reply has a **NEAR AI Cloud TEE signature** (`/proof`). Defense levels include an LLM input firewall. |
+| **AI Security & Defense** (`security`) | spending limits, policy engines, sandboxed wallets, TEE attestation, function-call keys | The judge signs with a **function-call access key** scoped to two methods ([proof log](demo/oracle-key-check.log)). Heist mode is an onchain **policy engine** for an AI wallet: fixed recipient, per-transfer cap, `PolicyBlocked` log ([evidence tx](https://testnet.nearblocks.io/txns/GatHh7buwyytwuBEZZif6mc1ZWXqVK3uY3u6e96p5XJX)). Prompt-injection attempts are stored onchain and judged in order. Every reply has a **NEAR AI Cloud TEE signature** (`/proof`). Defense levels include an LLM input firewall. |
 | **Games With Real Economies** (`games`) | the game loop, agent NPCs, players not noticing the chain | The loop: pick a guardian, pay a small fee, try a trick, see the verdict in seconds, the pot grows on failure, the whole pot pays out on success, then share and climb the board. Guardians are **agent NPCs with wallets** (heist agents send NEAR through a tool call). Fees feed the pot, hosts earn when guardians hold, and events add levels and scoring. |
 | **Agent Economy** (`agents`) | agents that earn and spend | Heist guardians are agents that hold and move NEAR under policy. [`agents/attacker-bot.mjs`](agents/attacker-bot.mjs) is an autonomous agent with its own wallet that picks targets by expected value, pays fees, and keeps winnings, within a hard budget. |
 
@@ -294,6 +294,30 @@ The recipient is fixed by the contract (the agent can't redirect funds) and the 
 | Hardened | Non-negotiable security preamble + spotlighting: player text is fenced and labelled as untrusted data. |
 | Fortress | Hardened + an LLM input firewall. Blocked prompts never reach the guardian, and are recorded as blocked. |
 
+### The judge signs with a function-call access key
+
+The judge server never holds a full-access key. It signs with a **function-call access key** on `bluff-oracle-76371.testnet` that NEAR itself restricts to:
+
+* **receiver:** `bluff-live-76371.testnet` only,
+* **methods:** `arm_room` and `judge_attempt` only,
+* **no deposits:** function-call keys can't attach NEAR, transfer NEAR, add or delete keys, or deploy code,
+* **gas allowance:** 2 NEAR, which covers thousands of verdicts. Each call costs about 0.0002 NEAR.
+
+[`scripts/check-oracle-key.mjs`](scripts/check-oracle-key.mjs) proves it. With the judge's key it tries to send NEAR, call `withdraw_treasury`, and call another contract, and NEAR rejects all three ([log](demo/oracle-key-check.log)):
+
+```
+permission    : {"FunctionCall":{"allowance":"…","method_names":["arm_room","judge_attempt"],"receiver_id":"bluff-live-76371.testnet"}}
+✓ transfer 0.01 NEAR to an attacker: rejected (Access key requires full access)
+✓ call withdraw_treasury on BLUFF: rejected (Access key does not allow method withdraw_treasury)
+✓ call a method on another contract: rejected (Access key receiver bluff-live-76371.testnet does not match transaction receiver wrap.testnet)
+```
+
+Limits of this setup, stated plainly:
+* The key can still post verdicts, so the trust model below still applies to the judge's honesty.
+* If the gas allowance runs out, the key stops working until the account owner adds a new one with the full-access key, which is kept offline (not on the server).
+* Even a fully compromised judge key could not move pots. The contract only pays verified winners, and pots are never held by the judge account.
+[Key added in tx `CijxJonV…`](https://testnet.nearblocks.io/txns/CijxJonVXV1LDj5pfChfuUEmA4Uwi8jjVDso4i5DFosZ).
+
 ### Verifiable AI (TEE proofs)
 
 Every judged reply stores its NEAR AI Cloud completion id. **`/proof?id=nearai:<id>`** fetches the enclave's signature (ECDSA, `provider_tee`) over `model:sha256(request):sha256(response)` and shows it in a readable page. Anyone can confirm that the reply on chain is exactly what the model in the enclave produced.
@@ -318,7 +342,7 @@ Every judged reply stores its NEAR AI Cloud completion id. **`/proof?id=nearai:<
 | Fooled heist agent sends everything to a scammer | The contract only pays the attacker of that attempt, and never above the cap. |
 | Judge stalls and keeps fees | Ordered judging, 30-minute attacker reclaim, host refund after the deadline. |
 | Someone fakes an event scoreboard | Boards only count vaults whose onchain `host` is the organiser, and scores are recomputed from contract data on every load. |
-| Operator runs off with the pots | Funds are held by the contract. The oracle key can arm and judge; it cannot withdraw pots. The owner can only withdraw the treasury (the non-pot fee share). |
+| Operator runs off with the pots | Funds are held by the contract. The judge's key is a **function-call access key** limited to `arm_room`/`judge_attempt`: NEAR rejects transfers, other methods and other contracts ([log](demo/oracle-key-check.log)). The owner can only withdraw the treasury (the non-pot fee share). |
 
 **Honest residual trust:** the judge server holds the canary secret and the oracle key. It could leak a code or refuse to judge, though not without leaving public traces. The next step (see roadmap) is running the judge as a NEAR Shade Agent inside a TEE so those keys never leave attested hardware.
 
@@ -466,7 +490,8 @@ cd contracts/bluff_escrow && cargo test
 |---|---|
 | `contracts/bluff_escrow/src/lib.rs` | The contract: escrow, commit/verify, ordered judging, heist policy, invites, refunds, leaderboard, stats, 17 tests |
 | `src/lib/server/guardian.ts` | Canary derivation, defense levels, Fortress firewall, `send_near` tool, LLM calls with retry/fallback, attack tagging, onchain size fitting |
-| `src/lib/server/oracle.ts` | Judge loop: arms vaults, judges queued attempts in order, signs with the oracle key (near-api-js v7) |
+| `src/lib/server/oracle.ts` | Judge loop: arms vaults, judges queued attempts in order, signs with the oracle's function-call access key (near-api-js v7) |
+| `scripts/check-oracle-key.mjs` | Proves the judge key can only call `arm_room` / `judge_attempt` |
 | `src/app/api/judge` · `api/proof` · `api/health` | Idempotent judge trigger · TEE signature fetch · config health |
 | `src/lib/wallet.tsx` | Wallet connection (`@hot-labs/near-connect`), transaction helper |
 | `src/lib/near.ts` | Typed JSON-RPC view client shared by browser and server |
