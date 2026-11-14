@@ -21,7 +21,8 @@ import {
 
 export default function HomePage() {
   const { data: allRooms } = useChain(() => api.rooms(0, 30), [], 15_000);
-  const rooms = (allRooms ?? []).filter(r => !isInviteOnly(r));
+  // Ticker: public vaults that are live or were cracked (expired/closed ones drop off).
+  const rooms = (allRooms ?? []).filter(r => !isInviteOnly(r) && (r.status === 'Breached' || (r.status === 'Active' && Number(r.expires_at) > Date.now())));
   const { data: stats } = useChain(() => api.stats(), [], 15_000);
 
   // Duplicate ticker list for a seamless marquee (repeat short lists so the strip is full)
