@@ -126,6 +126,78 @@ export default function HomePage() {
 
       )}
 
+      {/* WHO IS BLUFF FOR */}
+      <section className="py-20 px-4 border-b border-white/5 bg-[#03060a]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-emerald-400 mb-2">{'// '}WHO IS BLUFF FOR?</div>
+            <h2 className="font-display text-3xl sm:text-4xl font-black uppercase tracking-wider text-white text-glow-white">
+              One game. Three ways in.
+            </h2>
+            <p className="text-zinc-400 text-sm sm:text-base max-w-2xl mx-auto mt-2">
+              No coding needed to play. If you can write a convincing message, you can win.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              {
+                tag: 'PLAYERS',
+                emoji: '🎮',
+                title: 'Anyone who loves a challenge',
+                body: 'Out-talk a cartoon AI with wit, stories and social engineering. Make it spill its secret or send you NEAR. Climb the leaderboard.',
+                cta: 'Enter the raid lobby',
+                href: '/arenas',
+                color: 'emerald',
+              },
+              {
+                tag: 'AI BUILDERS',
+                emoji: '🛡️',
+                title: 'Developers shipping AI agents',
+                body: 'Paste your agent’s instructions, set a bounty and let the crowd attack it. If it holds, the fees grow your pot. If it breaks, you found the flaw first.',
+                cta: 'Host a vault',
+                href: '/create',
+                color: 'sky',
+              },
+              {
+                tag: 'TEAMS & CTFS',
+                emoji: '🏁',
+                title: 'Hackathons, companies, classrooms',
+                body: 'Run a private prompt-injection CTF: invite-only levels, a live scoreboard and automatic prizes. Even the organiser never sees the secrets.',
+                cta: 'Run an event',
+                href: '/events',
+                color: 'amber',
+              },
+            ].map(c => (
+              <Link
+                key={c.tag}
+                href={c.href}
+                className={`group clip-game-card border bg-[#060a11] p-6 transition-all hover:-translate-y-1 ${
+                  c.color === 'emerald'
+                    ? 'border-emerald-500/30 hover:border-emerald-400'
+                    : c.color === 'sky'
+                      ? 'border-sky-500/30 hover:border-sky-400'
+                      : 'border-amber-500/30 hover:border-amber-400'
+                }`}
+              >
+                <div className="text-4xl">{c.emoji}</div>
+                <div
+                  className={`mt-3 text-[11px] font-mono font-bold tracking-[0.2em] ${
+                    c.color === 'emerald' ? 'text-emerald-400' : c.color === 'sky' ? 'text-sky-400' : 'text-amber-400'
+                  }`}
+                >
+                  {c.tag}
+                </div>
+                <div className="font-display text-lg font-black uppercase tracking-wide text-white mt-1">{c.title}</div>
+                <p className="text-sm text-zinc-400 mt-2 leading-relaxed">{c.body}</p>
+                <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-display font-bold uppercase tracking-wider text-zinc-200 group-hover:text-white">
+                  {c.cta} <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* HOW TO PLAY SECTION WITH ANIMATED GREEN WIREFRAME MESH */}
       <section className="relative py-24 px-4 overflow-hidden bg-[#030b08] border-b border-white/5">
         <WireframeMeshCanvas />

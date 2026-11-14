@@ -10,6 +10,7 @@ import { Wallet, ChevronDown, Swords, Menu, X, ExternalLink, LogOut } from 'luci
 const LINKS = [
   { href: '/arenas', label: 'Raid Lobby' },
   { href: '/cve', label: 'Hall of Breaches' },
+  { href: '/events', label: 'Events & CTFs' },
   { href: '/how-it-works', label: 'How It Works' },
 ];
 
