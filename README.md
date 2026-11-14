@@ -9,6 +9,12 @@ In more detail: a **host** locks NEAR in a vault guarded by an AI. **Attackers**
 
 Every prompt and every reply is stored onchain. Together they form an open, incentivised red-teaming dataset for anyone building AI agents that hold keys or money.
 
+### Who is it for?
+
+* **Players (anyone):** no coding needed. If you can write a convincing message, you can out-talk a guardian and win NEAR.
+* **AI builders:** put your own agent's instructions in a vault, fund a bounty, and let the crowd stress-test it before real attackers do.
+* **Teams & CTFs:** hackathons, companies and classrooms can run a private prompt-injection competition. Host several invite-only vaults as levels and share one **event board** (`/event/<host>`), whose scoreboard is computed live from the contract: 100/200/300 points for cracking a Standard/Hardened/Fortress secret, 50/100/150 per heist. Only vaults whose onchain `host` is the organiser count, prizes pay out automatically, and the organiser never sees the secret codes, so nobody can rig it.
+
 Built for **NEAR HACKATHON 2026**. Tracks: **AI Security & Defense** (policy engine for agent wallets), **Games With Real Economies**, **Agent Economy** (agents that hold and move money).
 
 | | |
@@ -18,7 +24,7 @@ Built for **NEAR HACKATHON 2026**. Tracks: **AI Security & Defense** (policy eng
 | Judge / oracle account | [`bluff-oracle-76371.testnet`](https://testnet.nearblocks.io/address/bluff-oracle-76371.testnet) |
 | Guardian model | `Qwen/Qwen3.6-35B-A3B-FP8` on **NEAR AI Cloud** (TEE, signed responses) |
 
-### Demo video (4 min)
+### Demo video (4:42)
 
 **[▶ Watch `demo/bluff-demo.mp4`](demo/bluff-demo.mp4)**: a walkthrough of the live site. Every attack in it is a real testnet transaction, signed with the NEAR CLI wallet:
 
