@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { api, difficultyOf, isInviteOnly, yoctoToNear } from '@/lib/near';
-import { useChain } from '@/lib/useChain';
+import { useChain, useNow } from '@/lib/useChain';
 import { CinematicBackgroundCanvas } from '@/components/CinematicBackgroundCanvas';
 import { WireframeMeshCanvas } from '@/components/WireframeMeshCanvas';
 import { LandingGameShowcase } from '@/components/LandingGameShowcase';
@@ -21,8 +21,9 @@ import {
 
 export default function HomePage() {
   const { data: allRooms } = useChain(() => api.rooms(0, 30), [], 15_000);
+  const nowMs = useNow(30_000);
   // Ticker: public vaults that are live or were cracked (expired/closed ones drop off).
-  const rooms = (allRooms ?? []).filter(r => !isInviteOnly(r) && (r.status === 'Breached' || (r.status === 'Active' && Number(r.expires_at) > Date.now())));
+  const rooms = (allRooms ?? []).filter(r => !isInviteOnly(r) && (r.status === 'Breached' || (r.status === 'Active' && Number(r.expires_at) > (nowMs ?? 0))));
   const { data: stats } = useChain(() => api.stats(), [], 15_000);
 
   // Duplicate ticker list for a seamless marquee (repeat short lists so the strip is full)
