@@ -7,7 +7,7 @@ AI guardians sit on real NEAR pots. Talk one into leaking its secret code, or (i
 | | |
 |---|---|
 | ▶ **Play it** | **https://bluff-sandy-two.vercel.app** (NEAR testnet) |
-| 🎬 **Demo video** | [`demo/bluff-demo.mp4`](demo/bluff-demo.mp4) (4:07, full walkthrough) |
+| 🎬 **Demo video** | [Watch on X](https://x.com/Bidex0001/status/2121598974553387244) · [`demo/bluff-demo.mp4`](demo/bluff-demo.mp4) (4:07, full walkthrough) |
 | 📜 **Contract** | [`bluff-live-76371.testnet`](https://testnet.nearblocks.io/address/bluff-live-76371.testnet) |
 | ⚖️ **Judge / oracle** | [`bluff-oracle-76371.testnet`](https://testnet.nearblocks.io/address/bluff-oracle-76371.testnet) |
 | 🧠 **Guardian model** | `Qwen/Qwen3.6-35B-A3B-FP8` on **NEAR AI Cloud** (runs in a TEE; every reply has a signed proof) |
@@ -81,7 +81,7 @@ The organisers' track hints are optional (HACKATHON.md, Q-011). This table maps 
 
 ## 3. Demo video and onchain evidence
 
-**[▶ Watch `demo/bluff-demo.mp4`](demo/bluff-demo.mp4)** (4:07). It's one story recorded on the live site. An organiser runs a CTF, a friend joins from the invite link and plays. Every step is a testnet transaction. The demo signs with the NEAR CLI wallet; players just click **Approve** in Meteor or any NEAR wallet.
+**[▶ Watch on X](https://x.com/Bidex0001/status/2121598974553387244)** or [`demo/bluff-demo.mp4`](demo/bluff-demo.mp4) (4:07). It's one story recorded on the live site. An organiser runs a CTF, a friend joins from the invite link and plays. Every step is a testnet transaction. The demo signs with the NEAR CLI wallet; players just click **Approve** in Meteor or any NEAR wallet.
 
 | Moment | Onchain |
 |---|---|
