@@ -131,7 +131,7 @@ export default function CreateVaultPage() {
 
   return (
     <div className="min-h-screen bg-[#03060a] px-4 py-10">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <Link href="/arenas" className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-emerald-400 mb-6">
           <ArrowLeft className="w-3.5 h-3.5" /> Raid lobby
         </Link>

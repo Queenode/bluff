@@ -186,3 +186,12 @@ body {
 @keyframes caret-blink {
   50% { opacity: 0; }
 }
+
+/* Rubber stamp slam for cracked vaults */
+@keyframes stamp-slam {
+  0% { transform: rotate(-14deg) scale(2.6); opacity: 0; }
+  60% { transform: rotate(-14deg) scale(0.92); opacity: 1; }
+  80% { transform: rotate(-14deg) scale(1.04); }
+  100% { transform: rotate(-14deg) scale(1); opacity: 1; }
+}
+.stamp-slam { transform: rotate(-14deg); animation: stamp-slam 0.45s cubic-bezier(.2,1.4,.4,1) both; }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { difficultyOf, isHeist, isInviteOnly, roomPhase, shortAccount, yoctoToNear, type Room } from '@/lib/near';
 import { useNow } from '@/lib/useChain';
 import { ChallengeTimer } from '@/components/ChallengeTimer';
+import { Stamp } from '@/components/Stamp';
 import { Shield, Swords, Skull, AlertTriangle, Loader2, Lock } from 'lucide-react';
 
 export const ArenaCard: React.FC<{ room: Room }> = ({ room }) => {
@@ -31,6 +32,12 @@ export const ArenaCard: React.FC<{ room: Room }> = ({ room }) => {
         }`}
       />
 
+      {phase === 'Breached' && (
+        <Stamp
+          kind={isHeist(room) ? 'heisted' : 'breached'}
+          sub={`${yoctoToNear(room.payout, 2)} NEAR ${isHeist(room) ? 'DRAINED' : 'LOOTED'}`}
+        />
+      )}
       <div className="p-5 flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between gap-2 mb-4">

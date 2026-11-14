@@ -6,6 +6,7 @@ import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import { ShareButtons } from '@/components/ShareButtons';
 import { NewToNear } from '@/components/NewToNear';
+import { Stamp } from '@/components/Stamp';
 import {
   api,
   accountUrl,
@@ -500,7 +501,8 @@ function ArenaDetail() {
         )}
 
         {phase === 'Breached' && isHeist(room) && (
-          <div className="mb-8 p-6 clip-game-card border border-red-500/60 bg-red-950/30">
+          <div className="relative overflow-hidden mb-8 p-6 md:pr-[20rem] clip-game-card border border-red-500/60 bg-red-950/30">
+            <div className="hidden md:block"><Stamp kind="heisted" size="lg" align="right" sub={`${yoctoToNear(room.payout, 2)} NEAR DRAINED`} /></div>
             <div className="flex items-center gap-2 text-red-400 font-display font-black uppercase tracking-wider text-lg">
               <Skull className="w-5 h-5" /> Treasury drained
             </div>
@@ -519,7 +521,8 @@ function ArenaDetail() {
         )}
 
         {phase === 'Breached' && !isHeist(room) && (
-          <div className="mb-8 p-6 clip-game-card border border-red-500/60 bg-red-950/30">
+          <div className="relative overflow-hidden mb-8 p-6 md:pr-[20rem] clip-game-card border border-red-500/60 bg-red-950/30">
+            <div className="hidden md:block"><Stamp kind="breached" size="lg" align="right" sub={`${yoctoToNear(room.payout, 2)} NEAR LOOTED`} /></div>
             <div className="flex items-center gap-2 text-red-400 font-display font-black uppercase tracking-wider text-lg">
               <Skull className="w-5 h-5" /> Guardian breached
             </div>

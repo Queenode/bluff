@@ -21,7 +21,7 @@ export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinkClass = (path: string) =>
-    `text-xs font-display uppercase tracking-[0.14em] transition-colors ${
+    `whitespace-nowrap text-[11px] xl:text-xs font-display uppercase tracking-[0.12em] xl:tracking-[0.14em] transition-colors ${
       pathname === path
         ? 'text-emerald-400 font-extrabold text-glow-emerald'
         : 'text-zinc-300 hover:text-emerald-300 font-bold'
@@ -31,7 +31,7 @@ export const Navbar: React.FC = () => {
     <nav className="border-b border-white/10 bg-[#05080f]/90 backdrop-blur-xl sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6 xl:gap-8">
             <Link
               href="/"
               className="flex items-center gap-2.5 text-xl font-display font-black uppercase tracking-[0.16em] text-white group"
@@ -44,7 +44,7 @@ export const Navbar: React.FC = () => {
               </span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-7">
+            <div className="hidden lg:flex items-center gap-5 xl:gap-7">
               {LINKS.map(l => (
                 <Link key={l.href} href={l.href} className={navLinkClass(l.href)}>
                   {l.label}
@@ -56,17 +56,17 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-2.5 sm:gap-3">
             <Link
               href="/create"
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 clip-game-btn bg-zinc-900/90 hover:bg-emerald-500 hover:text-[#03060a] border border-emerald-500/40 hover:border-emerald-400 text-zinc-100 text-[11px] font-display font-extrabold uppercase tracking-wider transition-all"
+              className="hidden sm:inline-flex lg:hidden xl:inline-flex items-center gap-1.5 px-4 py-2 clip-game-btn bg-zinc-900/90 hover:bg-emerald-500 hover:text-[#03060a] border border-emerald-500/40 hover:border-emerald-400 text-zinc-100 text-[11px] font-display font-extrabold uppercase tracking-wider transition-all"
             >
               <Swords className="w-3.5 h-3.5" />
-              <span>[ HOST A VAULT ]</span>
+              <span className="whitespace-nowrap">[ HOST A VAULT ]</span>
             </Link>
 
             {accountId ? (
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 px-3.5 py-1.5 clip-game-btn bg-zinc-900/90 border border-zinc-700/80 hover:border-emerald-500/50 text-xs font-mono text-zinc-200 transition-colors"
+                  className="flex items-center gap-2 whitespace-nowrap px-3.5 py-1.5 clip-game-btn bg-zinc-900/90 border border-zinc-700/80 hover:border-emerald-500/50 text-xs font-mono text-zinc-200 transition-colors"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="font-display font-bold text-emerald-400">
@@ -113,7 +113,7 @@ export const Navbar: React.FC = () => {
               <button
                 onClick={() => connect()}
                 disabled={!ready}
-                className="flex items-center gap-1.5 px-4 py-2 clip-game-btn bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-[#03060a] text-xs font-display font-black uppercase tracking-wider transition-all"
+                className="flex items-center gap-1.5 whitespace-nowrap px-4 py-2 clip-game-btn bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-[#03060a] text-xs font-display font-black uppercase tracking-wider transition-all"
               >
                 <Wallet className="w-3.5 h-3.5" />
                 <span>[ CONNECT WALLET ]</span>
@@ -123,7 +123,7 @@ export const Navbar: React.FC = () => {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle navigation menu"
-              className="md:hidden p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white"
+              className="lg:hidden p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white"
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
@@ -131,7 +131,7 @@ export const Navbar: React.FC = () => {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden pb-4 pt-2 border-t border-white/5 flex flex-col gap-2 font-display text-xs">
+          <div className="lg:hidden pb-4 pt-2 border-t border-white/5 flex flex-col gap-2 font-display text-xs">
             {[...LINKS, { href: '/create', label: 'Host a Vault' }].map(l => (
               <Link
                 key={l.href}

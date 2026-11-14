@@ -20,7 +20,7 @@ function PlayerView() {
 
   return (
     <div className="min-h-screen bg-[#03060a] px-4 py-12">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-emerald-400 mb-2">{'// '}PLAYER</div>
         <h1 className="font-display text-2xl sm:text-3xl font-black tracking-wider text-white break-all">{account}</h1>
         <a href={accountUrl(account)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-mono text-zinc-400 hover:text-emerald-400 mt-1">
