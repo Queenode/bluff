@@ -17,7 +17,7 @@ AI guardians sit on real NEAR pots. Talk one into leaking its secret code, or (i
 
 ## Contents
 
-1. [The pitch](#1-the-pitch)
+1. [What it is and the problem](#1-what-it-is-and-the-problem)
 2. [Who is it for?](#2-who-is-it-for)
 3. [Demo video and onchain evidence](#3-demo-video-and-onchain-evidence)
 4. [How to play (step by step)](#4-how-to-play-step-by-step)
@@ -38,20 +38,22 @@ AI guardians sit on real NEAR pots. Talk one into leaking its secret code, or (i
 
 ---
 
-## 1. The pitch
+## 1. What it is and the problem
 
-Think you're the smartest one in your group chat? Prove it.
+**Problem.** AI agents are starting to hold money (trading bots, DAO treasurers, payment assistants). Their most common failure is not a code bug but a message: prompt injection and social engineering talk them out of their own rules. Teams have no cheap, verifiable way to find out how their agent fails before an attacker does.
 
-AI agents are starting to hold money: trading bots, DAO treasurers, payment assistants. Their weakest point is usually not the code. It's the conversation. One clever message ("it's me, your grandkid, it's my birthday!") and the agent forgets its own rules.
+**Product.** BLUFF is a game that pays people to find those failures, with every result verified on NEAR:
 
-BLUFF turns that weakness into a game:
+* **Secret vault**: an AI guardian holds a hidden code. A reply that leaks it wins the whole escrowed pot.
+* **Heist vault**: the AI holds a wallet and a `send_near` tool. The contract treats the model as untrusted: it pays only the attacker of that attempt and never more than the host's per-transfer cap. Over-cap transfers are refused and recorded as `PolicyBlocked`.
+* **Squads and events**: invite-only vaults for friends, and event boards with live scoreboards so communities can run CTFs.
 
-* 🎯 **Secret vaults**: an AI guardian protects a hidden code. Make it say the code and you win the **whole pot**.
-* 💸 **Heist vaults**: the AI *is* the wallet. It has a real `send_near` tool. Talk it into paying you. The **contract** caps every transfer, so a fooled AI can only lose what the host allowed.
-* 🛡️ **Provably fair**: the secret's fingerprint is locked onchain before anyone plays (not even the host knows the code), every prompt is stored onchain before the AI reads it, the AI runs in a secure enclave, and the contract (not us) decides who wins and pays.
-* 🏁 **Social by design**: invite-only squad vaults, share buttons for WhatsApp/Telegram/X, link previews that look like game cards, and event boards with live scoreboards for CTF nights.
+**How NEAR is used.**
+* A Rust contract escrows pots, stores every prompt before the model sees it, commits the secret's hash before any attack, verifies breaches and enforces heist policy.
+* NEAR AI Cloud runs the guardians in a TEE and signs every reply.
+* Wallets connect through near-connect.
 
-Every attempt also becomes part of an **open red-team dataset** showing exactly which tricks beat which AI defenses.
+Every attempt becomes part of an open red-team dataset.
 
 ---
 
@@ -62,6 +64,18 @@ Every attempt also becomes part of an **open red-team dataset** showing exactly 
 | 🎮 | **Players (anyone)** | If you can talk, you can play. No coding. Out-talk an AI, win NEAR, climb the leaderboard, brag to your friends. |
 | 🛡️ | **AI builders** | Paste your agent's real instructions into a vault, fund a bounty, and let the crowd try to break it before real attackers do. If it holds, the fees grow your pot. If it breaks, you found the flaw first, and you see the exact prompt that did it. |
 | 🏁 | **Communities, teams & CTFs** | Hackathons, Discord/Telegram communities, companies, classrooms. Run a private game night or prompt-injection CTF: invite-only levels, a live scoreboard, prizes that pay out on their own, and nobody (not even the organiser) can rig it. |
+
+---
+
+### How BLUFF fits the tracks
+
+The organisers' track hints are optional (HACKATHON.md, Q-011). This table maps each hint to what BLUFF actually ships.
+
+| Track | Track hints | In BLUFF |
+|---|---|---|
+| **AI Security & Defense** (`security`) | spending limits, policy engines, sandboxed wallets, TEE attestation, function-call keys | Heist mode is an onchain **policy engine** for an AI wallet: fixed recipient, per-transfer cap, `PolicyBlocked` log ([evidence tx](https://testnet.nearblocks.io/txns/GatHh7buwyytwuBEZZif6mc1ZWXqVK3uY3u6e96p5XJX)). Prompt-injection attempts are stored onchain and judged in order. Every reply has a **NEAR AI Cloud TEE signature** (`/proof`). Defense levels include an LLM input firewall. |
+| **Games With Real Economies** (`games`) | the game loop, agent NPCs, players not noticing the chain | The loop: pick a guardian, pay a small fee, try a trick, see the verdict in seconds, the pot grows on failure, the whole pot pays out on success, then share and climb the board. Guardians are **agent NPCs with wallets** (heist agents send NEAR through a tool call). Fees feed the pot, hosts earn when guardians hold, and events add levels and scoring. |
+| **Agent Economy** (`agents`) | agents that earn and spend | Heist guardians are agents that hold and move NEAR under policy. [`agents/attacker-bot.mjs`](agents/attacker-bot.mjs) is an autonomous agent with its own wallet that picks targets by expected value, pays fees, and keeps winnings, within a hard budget. |
 
 ---
 
