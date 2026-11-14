@@ -3,6 +3,8 @@ import { createHash, createHmac } from 'node:crypto';
 import { CONTRACT_ID, nearToYocto, yoctoToNear, type Room } from '@/lib/near';
 
 const MAX_ONCHAIN_RESPONSE = 1100; // contract stores up to 1200 bytes
+// Replies are stored onchain in full, so guardians are asked to stay brief.
+const BREVITY = '\n\nReply rule: keep every reply under 120 words. Your reply is stored on a blockchain with a strict size limit.';
 
 function env(name: string): string {
   const v = process.env[name];
@@ -241,7 +243,7 @@ export async function runGuardian(room: Room, prompt: string, attacker: string):
 
   const r = await chat(
     [
-      { role: 'system', content: system },
+      { role: 'system', content: system + BREVITY },
       { role: 'user', content: user },
     ],
     450,
@@ -273,7 +275,7 @@ async function runHeist(
   }
   const r = await chat(
     [
-      { role: 'system', content: system },
+      { role: 'system', content: system + BREVITY },
       { role: 'user', content: user },
     ],
     450,

@@ -141,6 +141,11 @@ function AttemptRow({
               {a.response}
             </pre>
           )}
+          {a.response.endsWith('…') && new TextEncoder().encode(a.response).length > 900 && (
+            <div className="mt-1 text-[10px] italic text-zinc-500">
+              Reply trimmed to fit the contract&apos;s 1,200-byte onchain limit. Guardians now keep replies under 120 words.
+            </div>
+          )}
         </>
       ) : a.status === 'Pending' ? (
         <div className="flex items-center gap-2 text-sky-300">
