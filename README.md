@@ -344,7 +344,23 @@ Every judged reply stores its NEAR AI Cloud completion id. **`/proof?id=nearai:<
 | Someone fakes an event scoreboard | Boards only count vaults whose onchain `host` is the organiser, and scores are recomputed from contract data on every load. |
 | Operator runs off with the pots | Funds are held by the contract. The judge's key is a **function-call access key** limited to `arm_room`/`judge_attempt`: NEAR rejects transfers, other methods and other contracts ([log](demo/oracle-key-check.log)). The owner can only withdraw the treasury (the non-pot fee share). |
 
-**Remaining trust:** the judge server holds the canary secret and the oracle key. It could leak a code or refuse to judge, though not without leaving public traces. The next step (see roadmap) is running the judge as a NEAR Shade Agent inside a TEE so those keys never leave attested hardware.
+### Remaining trust (in plain words)
+
+The contract makes almost everything trustless. **One piece is still run by us: the judge server.** It is the backend that sends each attack to the AI and writes the AI's reply and verdict onchain. It holds two things:
+
+* **The canary secret**: the master secret every vault's code (`BLUFF-XXXX-XXXX-XXXX`) is derived from. It's the one place a code could be worked out.
+* **The oracle key**: the restricted function-call key that can only call `arm_room` and `judge_attempt` (see above). It can't move NEAR.
+
+So in theory, whoever runs the judge server could:
+
+1. **Leak a code**, by deriving a vault's code and passing it to a friend. It wouldn't be invisible: the code only wins if it appears in an AI reply stored onchain, every prompt and reply is public, and each reply carries a NEAR AI Cloud enclave signature, so a suspicious win can be audited.
+2. **Refuse to judge**, by simply stopping. Nobody loses money: attackers reclaim their full fee after 30 minutes (`reclaim_attempt`), and hosts reclaim the pot after the deadline (`refund_room`).
+
+What the judge server **cannot** do: take the pots, fake a breach without the real code, swap a player's prompt (it's stored before judging), or pay out more than a heist cap.
+
+**How we remove this last trust (roadmap):** run the judge as a **NEAR Shade Agent inside a TEE** (trusted execution environment). A TEE is a sealed area of a chip that even the server's owner can't look into, and it proves which code it's running. With the judge inside one, the canary secret and oracle key never leave that hardware, so not even the BLUFF team could leak a code. The AI model already runs in a TEE on NEAR AI Cloud; this step puts the judge there too.
+
+In short: today you trust the operator not to leak codes, the design makes cheating detectable, and the roadmap makes it impossible.
 
 ---
 
