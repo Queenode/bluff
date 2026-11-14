@@ -529,7 +529,7 @@ cd contracts/bluff_escrow && cargo test
 ## 18. Built during the hackathon / disclosures
 
 * All of the NEAR integration was written during the hackathon window: the contract, judge, wallet flow, APIs, events, sharing and every chain-reading page. Earlier commits were a UI prototype with mocked data. That prototype was **replaced**, not extended, and no mock data remains.
-* AI coding assistants were used heavily: Gemini for the early UI prototype, Claude Code for the contract, judge, chain integration. All code was reviewed and tested by the team.
+* AI coding assistants were used during development (Gemini for the early UI prototype, Claude Code for the contract, judge, chain integration). All code was reviewed and tested by the team.
 * Guardian characters (Fred, Borin, Penny, Grandpa Gus, the Sphinx, …) and the "Campus CTF" organiser are fictional.
 
 ## License
