@@ -510,7 +510,7 @@ cd contracts/bluff_escrow && cargo test
 
 ## 17. Limitations and roadmap
 
-**Today (honest):**
+**Current scope:**
 * Testnet only: prizes are test NEAR.
 * The judge is a single server holding the canary secret and oracle key. Misbehaviour would be visible, but it's still a trusted component.
 * Secret vaults are first-blood. In events, a cracked level is done for everyone.
