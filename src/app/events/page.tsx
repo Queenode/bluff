@@ -82,7 +82,7 @@ export default function EventsPage() {
                   value={name}
                   onChange={e => setName(e.target.value)}
                   maxLength={80}
-                  placeholder="Acme Security CTF 2026"
+                  placeholder="Spring Security CTF 2026"
                   className="w-full bg-black/60 border border-zinc-800 focus:border-emerald-500/60 outline-none rounded px-3 py-2.5 font-mono text-sm text-zinc-100"
                 />
                 <div className="text-[11px] font-display font-bold uppercase tracking-wider text-zinc-300 mt-4 mb-1.5">
