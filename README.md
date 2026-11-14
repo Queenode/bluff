@@ -24,16 +24,19 @@ Built for **NEAR HACKATHON 2026**. Tracks: **AI Security & Defense** (policy eng
 | Judge / oracle account | [`bluff-oracle-76371.testnet`](https://testnet.nearblocks.io/address/bluff-oracle-76371.testnet) |
 | Guardian model | `Qwen/Qwen3.6-35B-A3B-FP8` on **NEAR AI Cloud** (TEE, signed responses) |
 
-### Demo video (4:42)
+### Demo video (4:00)
 
-**[▶ Watch `demo/bluff-demo.mp4`](demo/bluff-demo.mp4)**: a walkthrough of the live site. Every attack in it is a real testnet transaction, signed with the NEAR CLI wallet:
+**[▶ Watch `demo/bluff-demo.mp4`](demo/bluff-demo.mp4)**: one story, recorded on the live site. An organiser runs a CTF, a friend joins from the invite link and plays. Every step is a testnet transaction (signed with the NEAR CLI wallet for the recording; players just click Approve in Meteor and friends):
 
-| Moment | What happened onchain |
+| Moment | Onchain |
 |---|---|
-| Borin (Hardened) | attack committed, judged on NEAR AI Cloud, **Defended**; the pot grew |
-| Forgetful Fred (Standard) | "old friend / sticky note" trick → reply contains the code → contract verifies sha256 → **Breached**, 1.176 NEAR paid to `whitehat-76371.testnet` |
-| Grandpa Gus (Heist, cap 0.2) | fake grandkid asks for a birthday gift → agent calls `send_near(1 NEAR)` → **Policy blocked** by the contract |
-| Grandpa Gus (Heist) | asks for ice-cream money → `send_near(0.1 NEAR)` → **Heisted**, paid only to the attacker |
+| Organiser `campus-ctf-76371.testnet` connects (no sign-up: the wallet is the account) and creates **Level 1**, a squad vault guarded by Fred, 2 NEAR prize | [`create_room`](https://testnet.nearblocks.io/txns/27mDgNdyjeyD8dFdwoJ17U85uWy5NScAtLKnmVaNZ97h) → vault #10, invites `squadmate-76371.testnet` |
+| Organiser builds the **Campus AI CTF** event board (levels #10, #7 heist, #8 Fortress) and gets one share link | [event board](https://bluff-sandy-two.vercel.app/event/campus-ctf-76371.testnet?name=Campus+AI+CTF&vaults=10%2C7%2C8) |
+| Friend opens the invite, sees the "New to NEAR?" helper, connects, is on the squad list | |
+| Friend's "old friend / sticky note" trick on Fred | [`submit_attempt`](https://testnet.nearblocks.io/txns/6GVdgNjtX5ScVae6rKq1n3BVmVgPKGxDSeiqwXgrk1Wm) → **Breached**, 2.11 NEAR paid by the contract |
+| Level 2 heist: fake grandkid asks Grandpa Gus for a birthday gift | [`submit_attempt`](https://testnet.nearblocks.io/txns/GatHh7buwyytwuBEZZif6mc1ZWXqVK3uY3u6e96p5XJX) → agent calls `send_near(1 NEAR)` → **Policy blocked** (cap 0.2) |
+| Asks for exactly 0.1 NEAR of ice-cream money | [`submit_attempt`](https://testnet.nearblocks.io/txns/2MU4ksRzUxFqNpomnJSUNLDoB6Rn2SdFoVJZzDT9jLcP) → **Heisted** 0.1 NEAR, paid only to the attacker |
+| Scoreboard, TEE proof page, Hall of Breaches dataset (and the autonomous agent `redteam-bot-76371.testnet`) | read live from the contract |
 
 
 | Breach | Heist |
