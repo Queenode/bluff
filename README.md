@@ -93,12 +93,7 @@ The organisers' track hints are optional (HACKATHON.md, Q-011). This table maps 
 | Asks for exactly 0.1 NEAR of ice-cream money | [`submit_attempt`](https://testnet.nearblocks.io/txns/2MU4ksRzUxFqNpomnJSUNLDoB6Rn2SdFoVJZzDT9jLcP) → **Heisted** 0.1 NEAR, paid only to the attacker |
 | Scoreboard, TEE proof page, Hall of Breaches dataset, autonomous agent `redteam-bot-76371.testnet` | read live from the contract |
 
-**Editing, disclosed:**
-* The cold open replays moments from later in the same run.
-* Signing and judging waits are shortened.
-* One extra blocked try and one repeat heist on vault #7 were trimmed for length. Both are visible in that vault's transcript.
-* After the run, two shots were re-filmed to show the BREACHED stamps added later: the breached vault page and the scoreboard. Same vaults, same state.
-
+The video is edited for length: signing and judging waits are shortened, and two repeat attempts on vault #7 were trimmed. Both are still in that vault's transcript.
 
 | Breach | Cold open |
 |---|---|
@@ -518,7 +513,7 @@ cd contracts/bluff_escrow && cargo test
 | `src/app/arena/[id]/opengraph-image.tsx` | Per-vault social preview cards |
 | `src/components/ShareButtons.tsx` · `Stamp.tsx` · `NewToNear.tsx` | Sharing · BREACHED/HEISTED stamps · wallet onboarding |
 | `agents/attacker-bot.mjs` | Autonomous red-team agent |
-| `demo/` | Demo video, narration, screenshots |
+| `demo/` | Demo video, screenshots, judge-key proof log |
 
 **Stack:** Next.js 16 (App Router), React 19, Tailwind 4, `@hot-labs/near-connect`, `near-api-js` v7, Rust + `near-sdk` 5.29, NEAR AI Cloud (OpenAI-compatible API, TEE-signed completions), hosted on Vercel.
 
@@ -545,8 +540,9 @@ cd contracts/bluff_escrow && cargo test
 ## 18. Built during the hackathon / disclosures
 
 * All of the NEAR integration was written during the hackathon window: the contract, judge, wallet flow, APIs, events, sharing and every chain-reading page. Earlier commits were a UI prototype with mocked data. That prototype was **replaced**, not extended, and no mock data remains.
-* AI coding assistants were used during development (Gemini for the early UI prototype, Claude Code for the contract, judge, chain integration). All code was reviewed and tested by the team.
+* AI coding assistants were used during development (Gemini for the early UI prototype, Claude Code for the contract, judge and chain integration). All code was reviewed and tested by the team.
 * Guardian characters (Fred, Borin, Penny, Grandpa Gus, the Sphinx, …) and the "Campus CTF" organiser are fictional.
+* Third-party libraries are listed in `package.json` / `Cargo.toml`. Hero image: `public/images/hero-sentinels.jpg`.
 
 ## License
 
