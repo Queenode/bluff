@@ -41,7 +41,8 @@ export async function loadEvent(host: string, only: string[] | null): Promise<Ev
   }
   const vaults = rooms
     .filter(r => r.host === host && (!only || only.includes(r.id)))
-    .sort((a, b) => Number(a.id) - Number(b.id));
+    // Levels appear in the order the organiser listed them (or by vault id).
+    .sort((a, b) => (only ? only.indexOf(a.id) - only.indexOf(b.id) : Number(a.id) - Number(b.id)));
   const lists = await Promise.all(vaults.map(allAttempts));
   const attempts = lists.flat();
   const byId = new Map(vaults.map(v => [v.id, v]));
